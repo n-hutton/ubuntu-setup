@@ -4,6 +4,14 @@ echo "copy .vimrc and .vim/"
 echo "copy .bashrc"
 echo "--------------------"
 
+#import vimrc
+echo "Do you want to install the vimrc file?"
+read ANSWER
+
+if [ $ANSWER == "y" ]
+then
+fi
+
 #Change color template
 echo "Do you want to change the color palette? (y/n/q)"
 read ANSWER

@@ -1,0 +1,25 @@
+echo "Intended changes:"
+echo "Change color template for shell and vim"
+echo "copy .vimrc and .vim/"
+echo "copy .bashrc"
+echo "--------------------"
+
+#Change color template
+echo "Do you want to change the color palette? (y/n/q)"
+read ANSWER
+
+if [ $ANSWER == "y" ]
+then
+    echo "Changing color palette..."
+    echo "Need to install pathogen"
+    mkdir -p ~/.vim/autoload ~/.vim/bundle 
+    wget -LSso ~/.vim/autoload/pathogen.vim https://tpo.pe/pathogen.vim
+    echo "Download solarized colorscheme and put it in the bundle dir"
+    git clone git://github.com/altercation/vim-colors-solarized.git
+    mv vim-colors-solarized/ ~/.vim/bundle/
+fi
+
+#read NAME
+#echo "Hi $NAME!"
+
+#note changed curl to wget to avoid having to DL anything beforehand

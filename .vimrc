@@ -56,12 +56,12 @@ nnoremap <C-y> <C-w>+
 set nocompatible               " be iMproved
 filetype off                   " required!
 
-set rtp+=~/.vim/bundle/vundle/
-call vundle#rc()
-
-" let Vundle manage Vundle
-" required! 
-Bundle 'gmarik/vundle'
+"set rtp+=~/.vim/bundle/vundle/
+"call vundle#rc()
+"
+"" let Vundle manage Vundle
+"" required! 
+"Bundle 'gmarik/vundle'
 
 " My Bundles here:
 "
@@ -211,9 +211,9 @@ set tm=500
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Enable syntax highlighting
 syntax enable
-"colorscheme solarized
-"set background=dark
-"hi Comment ctermfg=darkblue
+colorscheme solarized
+set background=dark
+hi Comment ctermfg=darkblue
 
 "let g:solarized_termcolors=256
 "syntax enable
@@ -271,6 +271,9 @@ autocmd FileType * set tabstop=4|set shiftwidth=4|set expandtab
 
 "for markdown, do not want expandtab
 autocmd FileType markdown set tabstop=4|set shiftwidth=4|set noexpandtab
+
+"for makefiles, do not want expandtab
+autocmd FileType make set tabstop=4|set shiftwidth=4|set noexpandtab
 
 """"""""""""""""""""""""""""""
 " => Visual mode related

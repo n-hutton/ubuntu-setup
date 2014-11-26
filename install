@@ -1,35 +1,57 @@
 echo "Intended changes:"
+echo "copy .vimrc file"
 echo "Change color template for shell and vim"
 echo "copy .vimrc and .vim/"
 echo "copy .bashrc"
 echo "--------------------"
 
+#First, must update repositories if neccessary
+#sudo apt-get update
+
+#############################################################
 #import vimrc
 echo "Do you want to install the vimrc file?"
-read ANSWER
+read VIMRC_INSTALL
 
-if [ $ANSWER == "y" ]
+if [ $VIMRC_INSTALL == "y" ]
 then
-fi
+    cp .vimrc ~/
 
+    echo "Need to install pathogen in order to use vim plugins, and colorscheme"
+    mkdir -p ~/.vim/autoload ~/.vim/bundle 
+    sudo apt-get install curl
+    curl -LSso ~/.vim/autoload/pathogen.vim https://tpo.pe/pathogen.vim
+fi
+#############################################################
+
+#############################################################
+#import vimrc
+echo "Do you want to install the .bashrc file?"
+read BASHRC_INSTALL
+
+if [ $BASHRC_INSTALL == "y" ]
+then
+    cp .bashrc ~/
+fi
+#############################################################
+
+#############################################################
 #Change color template
 echo "Do you want to change the color palette? (y/n/q)"
-read ANSWER
+read CHANGE_COLOR
 
-if [ $ANSWER == "y" ]
+if [ $CHANGE_COLOR == "y" ]
 then
     echo "Changing color palette..."
     echo "First lets change the palette for the terminal"
     git clone git://github.com/Anthony25/gnome-terminal-colors-solarized.git
     sudo apt-get install dconf-cli
+    cd gnome-terminal-colors-solarized
     ./install.sh
-
-    #echo "Need to install pathogen"
-    #mkdir -p ~/.vim/autoload ~/.vim/bundle 
-    #wget -LSso ~/.vim/autoload/pathogen.vim https://tpo.pe/pathogen.vim
-    #echo "Download solarized colorscheme and put it in the bundle dir"
-    #git clone git://github.com/altercation/vim-colors-solarized.git
-    #mv vim-colors-solarized/ ~/.vim/bundle/
+    echo "Color palette now changed."
+    echo "Download solarized colorscheme and put it in the bundle dir"
+    git clone git://github.com/altercation/vim-colors-solarized.git
+    mv vim-colors-solarized/ ~/.vim/bundle/
 fi
 
 #read NAME

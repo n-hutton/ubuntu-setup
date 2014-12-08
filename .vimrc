@@ -524,9 +524,9 @@ set tm=500
 " =============Macros=============
 
 "map Q to do last executed macro
-map Q @@
+nnoremap Q @@
 
-"Execute macro over visual TODO:why xmap
+"Execute macro over visual range
 xnoremap @ :<C-u>call ExecuteMacroOverVisualRange()<CR>
 
 function! ExecuteMacroOverVisualRange()
@@ -545,6 +545,8 @@ onoremap H ^
 nnoremap L $
 onoremap L $
 vnoremap L $h 
+
+"Let's remap K and J since they can be of use
 
 "If we want to compare a vertical split column by column, we can enable this
 let wantCompareSplit   = 0

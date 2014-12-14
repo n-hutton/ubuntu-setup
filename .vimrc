@@ -282,6 +282,87 @@ set si "Smart indent
 vnoremap < <<gv
 vnoremap > >>gv
 
+"Automatically format selection - <C-U> removes the '<,'> automatically inserted so fn is called only once
+vnoremap <leader>f :<C-U>call FormatVisualSelection('spaces')<Cr><Cr>:messages<cr>
+
+" Start interactive EasyAlign in visual mode (e.g. vip<Enter>)
+vmap <Enter> <Plug>(EasyAlign)
+
+" Start interactive EasyAlign for a motion/text object (e.g. gaip)
+nmap ga <Plug>(EasyAlign)
+
+" Default comment behaviour:
+"   If a delimiter is in a highlight group whose name matches
+"   any of the followings, it will be ignored. a '!' means the opposite effect.
+"   By default, we want to be able to format comments, so DON'T ignore
+let g:easy_align_ignore_groups = ['String']
+
+function! FormatVisualSelection(tabsOrSpaces)
+    "This will act as a counter for how long the longest word is in our selection
+    let g:maxCharLen = 0
+
+    echom "working"
+
+    "let @9 = "^:let wordStart = col('.')e:let wordLength = col('.') - wordStart + 1:if(wordLength > maxCharLen) | echo 'art' | endif"
+
+    if a:tabsOrSpaces == 'spaces'
+        "For each line, find the maximum number of characters
+        "execute ":'<,'> ^col('.')>1"
+        for i in range((line("'>") - line("'<") + 1))
+            "Find the longest word per line
+            "let g:exeString = "".(i+line("'<"))."print"
+
+            let g:exeString = "normal "
+            let g:exeString = g:exeString.(i+line("'<"))."gg"
+            let g:exeString = g:exeString."^lh"
+            execute g:exeString
+
+            let g:exeString = "normal "
+            let g:exeString = g:exeString.":let g:wordStart = col('.')"
+            "this getline and col thing are off by 1 for some awful reason
+            if(getline('.')[col('.')] != ' ')
+                let g:exeString = g:exeString."E"
+            endif
+            "echom "nextchar is ".getline('.')[col('.') + 1]
+            let g:exeString = g:exeString.":let g:wordLength = col('.') - g:wordStart + 1"
+            let g:exeString = g:exeString.":if(g:wordLength > g:maxCharLen)"
+            let g:exeString = g:exeString."| let g:maxCharLen = g:wordLength"
+            let g:exeString = g:exeString."| endif"
+
+            execute g:exeString
+            "echom "Line is ".i." wordlength is ".g:wordLength."\n"
+            "echom "Exe is "
+            "echom "".g:exeString
+        endfor
+
+        "Now we should know how many tabs/spaces to input
+        for i in range((line("'>") - line("'<") + 1))
+
+            let tabsToInsert = (g:maxCharLen/4) + 1
+
+
+            for j in range(tabsToInsert)
+                "echom "inserting tab "
+                "Insert as many tabs as we need
+                let g:exeString = "normal! "
+                let g:exeString = g:exeString.(i+line("'<"))."gg^"
+                execute g:exeString
+
+                let g:exeString = "normal! "
+
+                if(getline('.')[col('.')] != ' ')
+                    let g:exeString = g:exeString."E"
+                endif
+                let g:exeString = g:exeString."a\t"
+                execute "normal! A tab "
+                execute g:exeString
+                "echom "Line is ".j." exeString is ".g:exeString
+            endfor
+
+        endfor
+    endif
+endfunction 
+
 "Note: set expandtab<cr>:retab!<cr> will turn tabs to spaces
 
 "We want colored indenting
@@ -524,9 +605,9 @@ set tm=500
 " =============Macros=============
 
 "map Q to do last executed macro
-nnoremap Q @@
+map Q @@
 
-"Execute macro over visual range
+"Execute macro over visual TODO:why xmap
 xnoremap @ :<C-u>call ExecuteMacroOverVisualRange()<CR>
 
 function! ExecuteMacroOverVisualRange()
@@ -545,8 +626,6 @@ onoremap H ^
 nnoremap L $
 onoremap L $
 vnoremap L $h 
-
-"Let's remap K and J since they can be of use
 
 "If we want to compare a vertical split column by column, we can enable this
 let wantCompareSplit   = 0
@@ -595,7 +674,8 @@ endfunction
 vnoremap <silent> <expr> p <sid>Repl()
 
 "force sudo writing TODO: explain how this works
-cmap w!! %!sudo tee > /dev/null 
+"cmap w!! %!sudo tee > /dev/null 
+cmap w!! w !sudo tee > /dev/null %
 
 "surround visual selection with parens TODO: rewrite as function (also strip whitespace)
 vnoremap s" <Esc>`>a"<Esc>`<i"<Esc>
@@ -640,3 +720,27 @@ endfunction
 "    match ExtraWhitespace /^\t*\zs \+/
 "endfunction
 
+"Function that prints number of spaces
+nmap <silent> <F4> :set opfunc=CountSpaces<CR>g@
+vmap <silent> <F4> :<C-U>call CountSpaces(visualmode(), 1)<CR>
+
+function! CountSpaces(type, ...)
+    let sel_save = &selection
+    let &selection = "inclusive"
+    let reg_save = @@
+
+    if a:0  " Invoked from Visual mode, use '< and '> marks.
+        silent exe "normal! `<" . a:type . "`>y"
+    elseif a:type == 'line'
+        silent exe "normal! '[V']y"
+    elseif a:type == 'block'
+        silent exe "normal! `[\<C-V>`]y"
+    else
+        silent exe "normal! `[v`]y"
+    endif
+
+    echomsg strlen(substitute(@@, '[^ ]', '', 'g'))
+
+    let &selection = sel_save
+    let @@ = reg_save
+endfunction

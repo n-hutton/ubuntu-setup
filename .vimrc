@@ -303,7 +303,10 @@ function! FormatVisualSelection(tabsOrSpaces)
 
     echom "working"
 
-    "let @9 = "^:let wordStart = col('.')e:let wordLength = col('.') - wordStart + 1:if(wordLength > maxCharLen) | echo 'art' | endif"
+    "let @9 = "^:let wordStart = col('.')
+e:let wordLength = col('.') - wordStart + 1
+:if(wordLength > maxCharLen) | echo 'art' | endif
+"
 
     if a:tabsOrSpaces == 'spaces'
         "For each line, find the maximum number of characters
@@ -318,16 +321,19 @@ function! FormatVisualSelection(tabsOrSpaces)
             execute g:exeString
 
             let g:exeString = "normal "
-            let g:exeString = g:exeString.":let g:wordStart = col('.')"
+            let g:exeString = g:exeString.":let g:wordStart = col('.')
+"
             "this getline and col thing are off by 1 for some awful reason
             if(getline('.')[col('.')] != ' ')
                 let g:exeString = g:exeString."E"
             endif
             "echom "nextchar is ".getline('.')[col('.') + 1]
-            let g:exeString = g:exeString.":let g:wordLength = col('.') - g:wordStart + 1"
+            let g:exeString = g:exeString.":let g:wordLength = col('.') - g:wordStart + 1
+"
             let g:exeString = g:exeString.":if(g:wordLength > g:maxCharLen)"
             let g:exeString = g:exeString."| let g:maxCharLen = g:wordLength"
-            let g:exeString = g:exeString."| endif"
+            let g:exeString = g:exeString."| endif
+"
 
             execute g:exeString
             "echom "Line is ".i." wordlength is ".g:wordLength."\n"
@@ -625,7 +631,7 @@ onoremap H ^
 "Don't want to select the end of line in visual mode
 nnoremap L $
 onoremap L $
-vnoremap L $h 
+vnoremap L $h
 
 "If we want to compare a vertical split column by column, we can enable this
 let wantCompareSplit   = 0

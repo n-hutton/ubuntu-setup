@@ -1,5 +1,6 @@
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Sections:
+"      =Paths, runtime, startup
 "      =General
 "      =Vim user interface
 "      =Regex and search
@@ -20,7 +21,7 @@
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-" =============General=============
+" =============Paths, runtime, startup=============
 
 "Vimrc configuration options for system dependent settings
 let wantSolarized          = 1
@@ -30,12 +31,51 @@ let wantVundle             = 1
 let wantDoSearch           = 1 "Different search highlighting. Best with solarized
 let wantIndentHighlight    = 0 "Different search highlighting. Best with solarized
 
+set runtimepath=~/.vim,/etc/vim,/usr/share/vim/vimfiles/,usr/share/vim/addons/,/usr/share/vim/vim72,/usr/share/vim/vimfiles,/usr/share/vim/addons/after/,~/.vim/after
+
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" =============General=============
+
+"let g:loaded_ctrlp = 1 "want ctrlp
+"Set this to 1 to set searching by filename (as opposed to full path) as the default: >
+let g:ctrlp_by_filename = 1
+"
+"Set this to 1 to set regexp search as the default: >
+let g:ctrlp_regexp = 1
+"
+"
+"When opening a file, if it's already open in a window somewhere, CtrlP will try to jump to it instead of opening a new instance: >
+"let g:ctrlp_switch_buffer = 'Et'
+"
+"When starting up, CtrlP sets its local working directory according to this variable: > r - git
+let g:ctrlp_working_path_mode = '0'
+"let g:ctrlp_working_path_mode = 'cr'
+"let g:ctrlp_working_path_mode = 'r'
+"let g:ctrlp_working_path_mode = 'ra'
+
+"Use this option to specify how the newly created file is to be opened when pressing <c-y>: >
+"let g:ctrlp_open_new_file = 't'
+
+"t - in a new tab.
+"h - in a new horizontal split.
+"v - in a new vertical split.
+"r - in the current window.
+
+" follow sym links
+let g:ctrlp_follow_symlinks = 1
+
+let g:ctrlp_prompt_mappings = {
+    \ 'AcceptSelection("e")': ['<c-t>'],
+    \ 'AcceptSelection("t")': ['<cr>', '<2-LeftMouse>'],
+    \ }
+
 "Mapleader - need to have this before any leader mappings
 let mapleader   = ","
 let g:mapleader = ","
 
 set nocompatible               " Be iMproved
 
+"TODO: create more robust method for pathogen install (am I using pathogen?)
 if(g:wantPathogen)
     execute pathogen#infect()
 endif
@@ -47,6 +87,7 @@ if(g:wantVundle)
         execute ":!git clone https://github.com/gmarik/Vundle.vim.git ~/.vim/bundle/Vundle.vim"
         execute ":PluginInstall"
     endif
+
 
     filetype off                  " required
 
@@ -75,6 +116,26 @@ if(g:wantVundle)
     "
     " see :h vundle for more details or wiki for FAQ
     " Put your non-Plugin stuff after this line
+    "
+    "
+
+"" Track the engine.
+"Plugin 'SirVer/ultisnips'
+"
+"" Snippets are separated from the engine. Add this if you want them:
+"Plugin 'honza/vim-snippets'
+"
+"
+"
+"" Trigger configuration. Do not use <tab> if you use https://github.com/Valloric/YouCompleteMe.
+"let g:UltiSnipsExpandTrigger="<tab>"
+"let g:UltiSnipsJumpForwardTrigger="<c-b>"
+"let g:UltiSnipsJumpBackwardTrigger="<c-z>"
+"
+"" If you want :UltiSnipsEdit to split your window.
+"let g:UltiSnipsEditSplit="vertical"
+"
+"Plugin 'Valloric/YouCompleteMe'
 
 endif
 
@@ -101,7 +162,7 @@ set wildmode=full
 "set wildmode=list:longest "make cmdline tab completion similar to bash
 
 " Ignore compiled files
-set wildignore=*.o,*~,*.pyc
+set wildignore=*.o,*~,*.pyc,*.gise,*.log,*.cmd,*.xmsgs,*isim,*.xise,*.prj,*.wdb,*.ini,*.exe,*.html
 
 " A buffer becomes hidden when it is abandoned
 set hid
@@ -112,6 +173,9 @@ set whichwrap+=<,>,h,l
 
 "Use :Invert to invert the background from dark to light
 command! -bar Invert :let &background = (&background=="light"?"dark":"light")
+
+"point vimruntime somewhere interesting
+let $VIMRUNTIME = "/home/nhutton/binaries/vim74/runtime"
 
 " Choose colorscheme - solarized or desert
 if(g:wantSolarized)
@@ -131,7 +195,9 @@ if(g:wantSolarized)
     endif
 else
     syntax enable
-    colorscheme desert
+    "colorscheme desert
+    "colorscheme murphy
+    "colorscheme default
 endif
 
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
@@ -155,8 +221,11 @@ nnoremap <silent> # #zz
 if(g:wantDoSearch)
     nnoremap <space> :call DoSearch('search')<Cr>/
 else
-    nnoremap <space> /
+   nnoremap <space> /
 endif
+
+"nnoremap <space> /
+nnoremap <silent>j :nohls<Cr>j
 
 "For visual mode, we don't want any funny buisness - just search normally
 vnoremap <space> /
@@ -209,6 +278,13 @@ function! DoSearch(command)
     endif
 endfunction
 
+"Convert all of the under_score in the file to camelCase
+"http://vim.wikia.com/wiki/Changing_case_with_regular_expressions (also \C and \l)
+function! CamelCase()
+    "sub char_char, with second char not allowing to be _t (uint8_t)
+    execute '%s/\C\v([a-z0-9])_(t[^a-zA-Z0-9])@!([a-z0-9])/\1\u\3/gc'
+endfunction
+
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " =============Save, backup and undo=============
 
@@ -231,8 +307,9 @@ nnoremap <leader>v :call CheckSavedBuffer()<cr><C-z>
 autocmd BufWrite *.py :call DeleteTrailingWS()
 autocmd BufWrite *.coffee :call DeleteTrailingWS()
 
+" TODO: this is not needed often, wrong section
 " Remove the Windows ^M - when the encodings gets messed up
-noremap <Leader>m mmHmt:%s/<C-V><cr>//ge<cr>'tzt'm
+"noremap <Leader>m mmHmt:%s/<C-V><cr>//ge<cr>'tzt'm
 
 " Keep undo history
 " This, like swap and backups, uses .vim-undo first, then ~/.vim/undo
@@ -278,12 +355,16 @@ endfunc
 set ai "Auto indent
 set si "Smart indent
 
+" Indent the whole file
+nnoremap == gg=G<c-o><c-o>gg=G<c-o><c-o>zz
+
 "keeps your visual selection when indenting
 vnoremap < <<gv
 vnoremap > >>gv
 
+"TODO: junk this
 "Automatically format selection - <C-U> removes the '<,'> automatically inserted so fn is called only once
-vnoremap <leader>f :<C-U>call FormatVisualSelection('spaces')<Cr><Cr>:messages<cr>
+"vnoremap <leader>f :<C-U>call FormatVisualSelection('spaces')<Cr><Cr>:messages<cr>
 
 " Start interactive EasyAlign in visual mode (e.g. vip<Enter>)
 vmap <Enter> <Plug>(EasyAlign)
@@ -303,10 +384,7 @@ function! FormatVisualSelection(tabsOrSpaces)
 
     echom "working"
 
-    "let @9 = "^:let wordStart = col('.')
-e:let wordLength = col('.') - wordStart + 1
-:if(wordLength > maxCharLen) | echo 'art' | endif
-"
+    "let @9 = "^:let wordStart = col('.')e:let wordLength = col('.') - wordStart + 1:if(wordLength > maxCharLen) | echo 'art' | endif"
 
     if a:tabsOrSpaces == 'spaces'
         "For each line, find the maximum number of characters
@@ -321,19 +399,16 @@ e:let wordLength = col('.') - wordStart + 1
             execute g:exeString
 
             let g:exeString = "normal "
-            let g:exeString = g:exeString.":let g:wordStart = col('.')
-"
+            let g:exeString = g:exeString.":let g:wordStart = col('.')"
             "this getline and col thing are off by 1 for some awful reason
             if(getline('.')[col('.')] != ' ')
                 let g:exeString = g:exeString."E"
             endif
             "echom "nextchar is ".getline('.')[col('.') + 1]
-            let g:exeString = g:exeString.":let g:wordLength = col('.') - g:wordStart + 1
-"
+            let g:exeString = g:exeString.":let g:wordLength = col('.') - g:wordStart + 1"
             let g:exeString = g:exeString.":if(g:wordLength > g:maxCharLen)"
             let g:exeString = g:exeString."| let g:maxCharLen = g:wordLength"
-            let g:exeString = g:exeString."| endif
-"
+            let g:exeString = g:exeString."| endif"
 
             execute g:exeString
             "echom "Line is ".i." wordlength is ".g:wordLength."\n"
@@ -390,6 +465,12 @@ endif
 "Default tab expansion for 
 autocmd FileType * set tabstop=4|set shiftwidth=4|set expandtab|set smarttab
 
+autocmd FileType vhdl set tabstop=2|set shiftwidth=2| set smarttab
+"autocmd FileType vhdl set autoindent|set noexpandtab|set tabstop=2|set shiftwidth=2
+
+"Igore all the cruft
+autocmd FileType vhdl set wildignore=*.o,*~,*.pyc,*.gise,*.log,*.xmsgs,isim\/,*.xise,*.prj,*.wdb,*.ini,*.exe,*.html,iseconfig\/,_xmsgs\/,ipcore_dir\/
+
 "for markdown, do not want expandtab
 autocmd FileType markdown set tabstop=4|set shiftwidth=4|set noexpandtab
 
@@ -429,8 +510,17 @@ endfunction
 nnoremap / ,
 
 "Remap jk and kj and kj to esc in insert mode
-inoremap jk <Esc>
+"inoremap jk <Esc>
 inoremap kj <Esc>
+
+"Auto-caps to-do
+iabbrev todo TODO:
+iabbrev Todo TODO:
+
+
+"tired of typing this
+"iabbrev forr for(int i = 0;i < vvv;i++){}
+inoremap ffor for(int i = 0;i < vvv;i++){}<Esc>==fvciw
 
 "make yank behave like other capitals
 map Y y$
@@ -442,9 +532,14 @@ map Y y$
 cnoremap <leader>r <C-r><C-">
 cnoremap <C-J> <Down>
 cnoremap <C-K> <Up>
+cnoremap <C-L> <Right>
+cnoremap <C-H> <Left>
 
 "Expands %% to the path of the file currently being edited rather than where vim was opened
 cnoremap <expr> %% getcmdtype() == ':' ? expand('%:h').'/' : '%%'
+
+"Want the filename too
+cnoremap <expr> ^^ getcmdtype() == ':' ? expand('%:t') : '^^'
 
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " =============Tabs, splits and buffers=============
@@ -453,10 +548,10 @@ set diffopt+=vertical       " start diff mode with vertical splits by default
 set splitright splitbelow   "makes the vsplit open on the RHS and split on the bottom
 
 " Easier way to move between splits
-map <C-j> <C-W>j
-map <C-k> <C-W>k
-map <C-h> <C-W>h
-map <C-l> <C-W>l
+nnoremap <C-j> <C-W>j
+nnoremap <C-k> <C-W>k
+nnoremap <C-h> <C-W>h
+nnoremap <C-l> <C-W>l
 
 "Use ctrl-u and p to switch between tabs
 nnoremap <C-u> gT
@@ -465,6 +560,18 @@ nnoremap <C-p> gt
 "Use ctrl-t and y to change split window size
 nnoremap <C-t> <C-w>-
 nnoremap <C-y> <C-w>+
+
+"make without having to drop to terminal, populate quickfix list
+nnoremap <leader>f :w<cr>:!clear<Cr><Cr>:make \| cwindow<Cr>
+
+"Trawl through errors
+nnoremap <leader>n :cn<cr>
+
+au BufReadPost quickfix  setlocal modifiable
+        \ | silent exe 'g/^||/s//>'
+        \ | setlocal nomodifiable
+
+"nnoremap <leader>d :echom hello
 
 " Possibly useful mappings for managing tabs
 map <leader>tn :tabnew<cr>
@@ -501,7 +608,8 @@ set viminfo^=%
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " =============Status line and line numbering=============
 
-set rnu "set relative line numbering
+"set rnu "set relative line numbering
+set number
 
 " Always show the status line
 set laststatus=2
@@ -578,6 +686,7 @@ autocmd filetype svn,*commit*,text setlocal spell
 "Note: usual completion is on <C-n> but more trouble to press all the time. (:help ins-completion)
 inoremap <Tab> <C-R>=Tab_Or_Complete()<CR>
 
+
 function! Tab_Or_Complete()
   if col('.')>1 && strpart( getline('.'), col('.')-2, 3 ) =~ '^\w'
     return "\<C-N>"
@@ -631,7 +740,18 @@ onoremap H ^
 "Don't want to select the end of line in visual mode
 nnoremap L $
 onoremap L $
-vnoremap L $h
+
+"Want different behaviours for block and normal visual mode
+vnoremap L :<C-u>call MoveToEndOfLine()<CR>
+
+function! MoveToEndOfLine()
+    let m = visualmode()
+    if m == "\<C-V>"
+        call feedkeys("gv$")
+    else
+        call feedkeys("gv$h")
+    endif
+endfunction
 
 "If we want to compare a vertical split column by column, we can enable this
 let wantCompareSplit   = 0
@@ -661,8 +781,22 @@ function! CompareVsplit(direction)
     endif
 endfunction
 
+
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " =============TODO=============
+" A command to scrape all the TODOs to the top of the file
+"
+"
+
+
+cabbrev ccc s/\v\t+:/\s:/
+
+function! TODO() 
+    normal! o//todolist
+    "make a mark t for todo
+    normal! mt
+    execute ":g/TODO/normal yygg'tp==jk"
+endfunction
 
 "TODO: get paste-over working again
 "keeps the text in the default reg when pasting in visual mode - WHY IS THIS NOT WORKING
@@ -703,14 +837,85 @@ autocmd FileType c vnoremap <buffer> ss <Esc>`>a/*<Esc>`<i*/<Esc>
 command! -nargs=* -complete=shellcmd R new | setlocal buftype=nofile bufhidden=hide noswapfile | r !<args>
 
 "TODO: integrate into newSearch
-function! TODOThing()
-au CursorMoved * nohls
-au InsertEnter * nohls
-au CursorHold * let @/ = '\V\<'.escape(expand('<cword>'), '\').'\>'
-endfunction
+"function! TODOThing()
+"au CursorMoved * nohls
+"au InsertEnter * nohls
+"au CursorHold * let @/ = '\V\<'.escape(expand('<cword>'), '\').'\>'
+"endfunction
 
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " =============Scratch area=============
+"
+"NOTE: for centos, needed to do the following to make;make install vim:
+"
+" sudo yum install ncurses-devel
+" sudo yum install libselinux-devel
+"
+" Sort lines by length - stack overflow 11531073
+" usage-  :'<,'>call SortLines()
+function! SortLines() range
+    execute a:firstline . "," . a:lastline . 's/^\(.*\)$/\=strdisplaywidth( submatch(0) ) . " " . submatch(0)/'
+    execute a:firstline . "," . a:lastline . 'sort n'
+    execute a:firstline . "," . a:lastline . 's/^\d\+\s//'
+endfunction
+
+"Create check it command for now, calls the actual function
+command! CheckIt :call CheckItFunction()
+
+"Function will look in the current file for the regex, populate the quickfix list
+"Caveats: searches the SAVED VERSION of the file
+"
+" will only open quickfix window if there are matches in the file
+" Close the quickfix window with :cclose or :q while focused
+function! CheckItFunction()
+    "The regex we are going to match to. Try to read from file ~/regex.txt if possible
+    if filereadable(expand("~/regex.txt"))
+        tabe 
+        execute ":r ~/regex.txt"
+        execute "normal! d$"
+        execute ":q!"
+        let g:regexString = @"
+    else
+        let g:regexString = '\v(wq|^i|i$)'
+    endif
+
+    try
+        execute ":silent vimgrep ".'"'.g:regexString.'" '.expand('%')
+        execute ":echom ".'"'.g:regexString.'!!"'
+    catch
+    endtry
+    cwindow
+endfunction
+"who
+
+"syntax match possibleError "\w\+"
+"highlight link possibleError Todo
+
+"ctrl-p
+set runtimepath^=~/.vim/bundle/ctrlp.vim
+
+"Let's use ctrl-f to find files, eh - note it triggers from current working dir
+let g:ctrlp_map = '<c-f>'
+"noremap <C-f> :CtrlP ~/sky_git/src/vhdl<Cr>
+"nnoremap <C-F> <C-T>
+
+"caps-ify last inserted selection
+nnoremap <leader>u `[v`]~
+
+nnoremap J :echoerr "You have caps lock on"<cr>
+nnoremap K :echoerr "You have caps lock on"<cr>
+
+"Let's do this line number thing! (??)
+vnoremap <C-a> :call Incr()<CR>
+
+function! Incr()
+  let a = line('.') - line("'<")
+  let c = virtcol("'<")
+  if a > 0
+    execute 'normal! '.c.'|'.a."\<C-a>"
+  endif
+  normal `<
+endfunction
 
 "Notes:
 "I want to be able to create a small :sp where I can run command line options... Has that been done?
@@ -750,3 +955,32 @@ function! CountSpaces(type, ...)
     let &selection = sel_save
     let @@ = reg_save
 endfunction
+
+"nerdtree thingies
+"close if the only window left open is nerdtree
+autocmd bufenter * if (winnr("$") == 1 && exists("b:NERDTreeType") && b:NERDTreeType == "primary") | q | endif
+
+"The command to toggle NERDTree
+noremap <C-n> :NERDTreeToggle<Cr>
+
+"Quick hack for vhdl stuff
+iabbrev slv std_logic_vector
+iabbrev SLV std_logic_vector
+iabbrev sll std_logic
+iabbrev SLL std_logic
+
+"Function to turn port to port map in vhdl ???
+"'<,'>s/\v^\s+(\w+).*/\1 => \1/gc
+
+"quick create processes
+iabbrev procc 
+            \<Cr>process(clk) is 
+            \<cr>begin
+            \<cr>  if rising_edge(clk) then
+            \<cr>      a <= b;
+            \<cr>  end if;
+            \<cr>end process; kj==kkkH
+
+" 'others' typing
+iabbrev othh 
+            \(others => '0')

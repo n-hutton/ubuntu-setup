@@ -1,43 +1,65 @@
+echo "------------------------------------"
 echo "Intended changes:"
-echo "copy .vimrc file"
-echo "Change color template for shell and vim"
-echo "copy .vimrc and .vim/"
+echo "copy .vimrc"
 echo "copy .bashrc"
-echo "--------------------"
-
-#First, must update repositories if neccessary
-#sudo apt-get update
-
-#############################################################
-#import vimrc
-echo "Do you want to install the vimrc file?"
-read VIMRC_INSTALL
-
-if [ $VIMRC_INSTALL == "y" ]
-then
-    cp .vimrc ~/
-
-    echo "Need to install pathogen in order to use vim plugins, and colorscheme"
-    mkdir -p ~/.vim/autoload ~/.vim/bundle 
-    sudo apt-get install curl
-    curl -LSso ~/.vim/autoload/pathogen.vim https://tpo.pe/pathogen.vim
-fi
-#############################################################
+echo "Change color template for shell and vim [Remember to save terminal profile first]" 
+echo "copy .vim/"
+echo "------------------------------------"
 
 #############################################################
-#import vimrc
+# Import vimrc, plugins etc
+
+while true; do
+    read -p "Update plugins etc. from internet?" yn
+    case $yn in
+        [Yy]* ) git pull;
+		rm -f pathogen.vim;
+                wget https://tpo.pe/pathogen.vim;
+		mv pathogen.vim ./vim_files;
+		echo "Completed updating files";
+                break;;
+        [Nn]* ) echo "ok";break;;
+        * ) echo "Please answer yes or no.";;
+    esac
+done
+
+#############################################################
+# import bashrc
 echo "Do you want to install the .bashrc file?"
 read BASHRC_INSTALL
 
 if [ $BASHRC_INSTALL == "y" ]
 then
-    cp .bashrc ~/
+    cp ./config_files/.bashrc ~/
+fi
+#############################################################
+
+#############################################################
+# Import vimrc, plugins etc
+
+while true; do
+    read -p "Copy .vimrc?" yn
+    case $yn in
+        [Yy]* ) cp ./vim_files/.vimrc ~/;break;;
+        [Nn]* ) echo "ok";break;;
+        * ) echo "Please answer yes or no.";;
+    esac
+done
+
+#############################################################
+echo "Copy vim plugins?"
+read VIMRC_INSTALL
+
+if [ $VIMRC_INSTALL == "y" ]
+then
+    mkdir -p ~/.vim/autoload ~/.vim/bundle 
+    cp vim_files/pathogen.vim ~/.vim/autoload/pathogen.vim
 fi
 #############################################################
 
 #############################################################
 #Change color template
-echo "Do you want to change the color palette? (y/n/q)"
+echo "Do you want to change the color palette? (y/n)"
 read CHANGE_COLOR
 
 if [ $CHANGE_COLOR == "y" ]
@@ -53,8 +75,3 @@ then
     git clone git://github.com/altercation/vim-colors-solarized.git
     mv vim-colors-solarized/ ~/.vim/bundle/
 fi
-
-#read NAME
-#echo "Hi $NAME!"
-
-#note changed curl to wget to avoid having to DL anything beforehand

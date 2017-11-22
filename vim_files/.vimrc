@@ -32,11 +32,12 @@ let wantDoSearch           = 1 " Different search highlighting. Best with solari
 set runtimepath=~/.vim,/etc/vim,/usr/share/vim/vimfiles/,usr/share/vim/addons/,/usr/share/vim/vim74,/usr/share/vim/vimfiles,/usr/share/vim/addons/after/,~/.vim/after
 
 " point vimruntime somewhere interesting (syntax/help stuff) *** MAY HAVE TO MOD THESE FOR NEW INSTALL *** TODO: (`HUT`) : make generic
-let $VIMRUNTIME = "/ XXX /runtime"
+" TODO: (`HUT`) : change all xxxs
+"let $VIMRUNTIME = "/ XXX /runtime"
 
 " Specify the location of our helpfile
 " NOTE: (`HUT`) : to add helpfiles do :helptags ~/.vim/bundle/path/doc then check with :help local-additions (need to reload vim) (try also :Helptags for pathogen adder)
-set helpfile=/ XXX runtime/doc/help.txt
+"set helpfile=/ XXX runtime/doc/help.txt
 
 " Common values we want to set
 set nocompatible               " Be iMproved
@@ -420,7 +421,7 @@ nnoremap == gg=G<c-o><c-o>gg=G<c-o><c-o>zz
 
 " Special indenting for certain filetypes
 autocmd FileType vhdl :nnoremap == :call CleanVhdl()<Cr>
-autocmd FileType vhdl :so ~/ XXX /vim74/runtime/indent/vhdl.vim
+"autocmd FileType vhdl :so ~/ XXX /vim74/runtime/indent/vhdl.vim
 
 " TODO: (`HUT`) :: this should only do things to signals...
 function! CleanVhdl()

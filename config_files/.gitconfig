@@ -1,11 +1,27 @@
 [user]
-    name = n-hutton
+	name = nhutton
+	email = nathan.cameron.hutton@gmail.com
 
 [alias]
-    lg = log --color --graph --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)<%an>%Creset' --abbrev-commit
-    st = status -s
+	lg = log --color --graph --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)<%an>%Creset' --abbrev-commit
+	st = status -s
     diffgui = difftool --tool=p4merge --no-prompt
     mod = ls-files -m
 
+	sta = diff --name-only
+	co = checkout
+
 [diff]
     tool = kompare
+[core]
+	excludesfile = /home/nathan/.gitignore
+[push]
+	default = simple
+
+[alias]
+    pullall = "!f(){ git pull \"$@\" && git submodule sync --recursive && git submodule update --init --recursive; }; f"
+    syncUpdate = "!f(){ git submodule sync --recursive && git submodule update --init --recursive; }; f"
+    logg = "!f(){ git log --graph --stat --decorate=full --color --word-diff=color -M -C --find-copies-harder -l100 --histogram \"$@\"; }; f"
+    oldest-ancestor = !zsh -c 'diff --old-line-format= --new-line-format= <(git rev-list --first-parent \"${1:-master}\") <(git rev-list --first-parent \"${2:-HEAD}\") | head -1' -
+[url "git@github.com:"]
+	insteadOf = github:

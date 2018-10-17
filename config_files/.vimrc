@@ -32,7 +32,9 @@ let wantPathogen           = 1 " Req for: solarized
 let wantDoSearch           = 1 " Different search highlighting. Best with solarized
 
 " Note *** MAY HAVE TO MOD THESE FOR NEW INSTALL *** TODO: (`HUT`) : make generic
-set runtimepath=~/.vim,/etc/vim,/usr/share/vim/vimfiles/,usr/share/vim/addons/,/usr/share/vim/vim74,/usr/share/vim/vimfiles,/usr/share/vim/addons/after/,~/.vim/after
+set runtimepath=~/.vim,/etc/vim,/usr/share/vim/vimfiles/,usr/share/vim/addons/,/usr/share/vim/vim80,/usr/share/vim/vimfiles,/usr/share/vim/addons/after/,~/.vim/after
+
+" TODO: (HUT) : put check vir /usr/share/vim/vimXX here
 
 " point vimruntime somewhere interesting (syntax/help stuff) *** MAY HAVE TO MOD THESE FOR NEW INSTALL *** TODO: (`HUT`) : make generic
 " TODO: (`HUT`) : change all xxxs
@@ -67,7 +69,7 @@ set listchars=tab:>-,trail:~,extends:>,precedes:<
 
 " Ignore compiled files etc. May be added to later depending on filetype
 set wildignore+=*.o,*~,*.pyc,*.gise,*.cmd,*.xmsgs,*isim,*.xise,*.prj,*.wdb,*.ini,*.exe,*.html,*.d
-set wildignore+=*.lsrc,*.crp,*.ngc
+set wildignore+=*.lsrc,*.crp,*.ngc,*.xml
 
 "set wildignore+=*\\trash\\**
 set wildignore+=*/build/*,*/cmake-build-debug/*,*/asio/*
@@ -129,7 +131,7 @@ let g:ctrlp_prompt_mappings = {
     \ 'AcceptSelection("t")': ['<cr>', '<2-LeftMouse>'],
     \ }
 
-set mouse=a " TODO: (`HUT`) : think about this
+set mouse=a " set mouse=c to turn this off
 
 """""""""""""""""""""""""""""""""""""""""
 " EasyAlign plugin
@@ -256,7 +258,7 @@ nnoremap <silent> N Nzz
 nnoremap <silent> * *zz
 nnoremap <silent> # #zz
 
-" quickly search/replace word under cursor
+" quickly search/replace word under cursor // TODO: (`HUT`) : make this not blast the reg
 nnoremap <leader>s "9yiw:%s/\<<C-r><C-9>\>/<C-r><C-9>
 vnoremap <leader>s "9y:%s/<C-r><C-9>/<C-r><C-9>
 
@@ -563,7 +565,8 @@ map <leader>tc :tabclose<cr>
 map <leader>tm :tabmove
 
 "change buffers quickly
-nmap <leader>b :ls<CR>:buffer<Space>
+"nmap <leader>b :ls<CR>:buffer<Space>
+nmap <leader>b :! git blame <c-r>=expand("%")<Cr>
 
 " Opens a new tab with the current buffer's path
 " Super useful when editing files in the same directory
@@ -682,13 +685,22 @@ set statusline+=%*
 
 "folding settings
 "set foldmethod=indent "fold based on indent
-"set foldmethod=syntax "fold based on indent
 "set foldnestmax=3 "deepest fold is 3 levels
-""set nofoldenable "don't fold by default
+
+set foldmethod=syntax "fold based on indent
+set nofoldenable "don't fold by default
+" Toggle folds on/off
+"nnoremap <leader>c zi
+
+"Search only in open text
+"set fdo-=search
+
+"Set colour
+hi Folded ctermbg=8
 
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " =============Spell check, autocomplete=============
-"
+
 "Ignore all the cruft when searching with certain filetypes
 autocmd FileType vhdl set wildignore+=iseconfig\/,_xmsgs\/,ipcore_dir\/
 
@@ -698,11 +710,14 @@ map <leader>ss :setlocal spell!<cr>
 
 " Use custom spellfile
 set spell spellfile=~/.vim/spell/nh.utf-8.add
-"set spell spelllang=nh
-"Spelling correct
-"
-"nnoremap M z=
-"nnoremap m ]s
+
+" Note, to add to spellfile, zg
+
+hi clear SpellBad
+hi SpellBad cterm=underline
+
+" Choose first spell option
+nnoremap <leader>z 1z=
 
 "spell check when writing commit logs
 autocmd filetype svn,*commit*,text setlocal spell
@@ -797,7 +812,7 @@ onoremap H ^
 " TODO: (`HUT`) : improve this a lot
 nnoremap J :echo "CAPS LOCK?"<cr>}jzz
 nnoremap K :echo "CAPS LOCK?"<cr>{kzz
-vnoremap J /^$<Cr>
+vnoremap J /\v(^$\|%$)<Cr>
 vnoremap K ?^$<Cr>
 
 "Don't want to select the end of line in visual mode
@@ -952,8 +967,8 @@ inoremap kj <Esc>
 snoremap kj <Esc>B
 
 "Auto-caps to-do
-iabbrev todo TODO: (`HUT`) :
-iabbrev Todo TODO: (`HUT`) :
+iabbrev todo TODO: (HUT) :
+iabbrev Todo TODO: (HUT) :
 
 "noremap Y :call system('tee ~/clip', @0)<Cr>
 
@@ -961,8 +976,8 @@ iabbrev Todo TODO: (`HUT`) :
 iabbrev zn \n
 
 "Faster command-mode manipulation, quick reg access, fast history search
-cnoremap <leader>r <C-r><C-">
-"vnoremap <leader>r <C-r><C-">
+cnoremap <leader>r <C-r><C-0>
+"vnoremap <leader>r <C-r><C-0>
 cnoremap <C-J> <Down>
 cnoremap <C-K> <Up>
 cnoremap <C-L> <Right>
@@ -1268,9 +1283,6 @@ function! WhatVisualMode()
         echo 'argh'
     endif
 endfunction 
-
-nnoremap <leader>z :%g/0000000/d<cr>:%s/.*: 0000//<cr>
-"nnoremap <leader>a :%s/.*: 0000//<cr>:nunmap J<cr>:%g/./normal J<Cr>:%g!/ 0001/d<Cr>:%s/ 0001//<cr>
 
 nnoremap <leader>a :call FormatFile()<Cr>
 "colorscheme desert

@@ -10,6 +10,8 @@
 
 	sta = diff --name-only
 	co = checkout
+  pushup = "!gitbranchname() { git symbolic-ref --short HEAD; }; gitpushupstream() { git push --set-upstream origin `gitbranchname`; }; gitpushupstream"
+  upstream = "!git fetch main && git checkout develop && git merge main/develop"
 
 [diff]
     tool = kompare

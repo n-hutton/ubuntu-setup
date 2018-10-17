@@ -8,9 +8,12 @@ HISTCONTROL=ignoreboth
 # append to the history file, don't overwrite it
 shopt -s histappend
 
+# Force writing to the bash history on every prompt
+PROMPT_COMMAND="history -a;$PROMPT_COMMAND"
+
 # for setting history length see HISTSIZE and HISTFILESIZE in bash(1)
-HISTSIZE=100000
-HISTFILESIZE=200000
+HISTSIZE=1000000
+HISTFILESIZE=2000000
 
 # check the window size after each command and, if necessary,
 # update the values of LINES and COLUMNS.
@@ -82,10 +85,14 @@ alias ll='ls -alF'
 alias la='ls -A'
 alias l='ls -CF'
 
+alias ggg='gdb --ex=run--args'
+
 # open changed git files
 #alias gitst='git st | grep "^ M" | cut -f 3 -d \' \''
 
 alias lsdir='ls --group-directories-first -lF'
+
+alias doit='sudo apt-get -y install `cat ~/.bash_history | tail -n 1 | sed -e "s/^\(\w\+\).*/\1/"` && cat ~/.bash_history | tail -n 2'
 
 # Fix annoying screen error
 alias sc='screen && clear && echo \"Killed screen\"'
@@ -116,10 +123,13 @@ alias ls="ls --color=auto"
 #alias ls="ls --color=none"
 
 alias netcat='nc'
+#alias v='vim.gnome -p'
 alias v='vim -p'
 alias ,q='exit'
 alias py='python3'
 
+alias ecl='eclipse --launcher.openFile'
+alias startecl='if ! pgrep -x "eclipse" > /dev/null; then /home/nathan/Downloads/eclipse-cpp-oxygen-R-linux-gtk-x86_64_binary/eclipse/eclipse 2>&1 & fi'
 
 #alias hibernate='/usr/bin/gnome-screensaver-command --lock && pm-hibernate'
 alias term='gnome-terminal --geometry 208x290+0+0;exit;'
@@ -187,8 +197,14 @@ if [ 0 -ne $bg_jobs_cur_r ] || [ 0 -ne $bg_jobs_cur_s ] ; then
 fi
 }
 
+parse_git_branch() {
+     # Old - just your branch name
+     #git branch 2> /dev/null | sed -e '/^[^*]/d' -e 's/* \(.*\)/ (\1)/'
+     git branch -vv 2> /dev/null | sed -e '/^[^*]/d' -e 's/.*\[\(.*\)\].*/ (\1)/'
+}
+
 # Command line prompt:
-export PS1='\[\e[0;34m\]\u@\h \[\e[0;34m\]\[\e[0;32m\]\w \[\e[0m\]\[\e[0;33m\]\n`if [ "$mybash" = "mybash" ]; then print_job_counts; fi` $ \[\e[0m\]'
+export PS1='\[\e[0;34m\]\u@\h \[\e[0;34m\]\[\e[0;32m\]\w\[\e[0m\]$(parse_git_branch)\[\e[0;33m\]\n`if [ "$mybash" = "mybash" ]; then print_job_counts; fi` $ \[\e[0m\]'
 
 mybash=mybash
 export mybash
@@ -197,8 +213,9 @@ export mybash
 # Finding functions
 
 # Set a proj variable for project base
-proj=~/repos
+proj=~/repos/fetch-ledger
 export proj
+alias pro='cd $proj'
 
 setproj(){
     tempvar=`pwd`
@@ -207,7 +224,6 @@ setproj(){
     export proj
 }
 
-alias pro='cd $proj'
 
 ###############
 # Grep/find
@@ -225,9 +241,27 @@ ffind(){
     find -name $@
 }
 
-cgrep(){
-    grep -rnIsT $@ --include=*.cpp --include=*.h --include=*.cc ./
+igrep(){
+    grep -rnIsTi "$*" ./
 }
+
+cgrep(){
+    grep -rnIsTi "$*" --include=*.cpp --include=*.h --include=*.c --include=*.cc --include=*.hpp ./
+}
+
+cgrepl(){
+    grep -rnIsTi "$*" --include=*.cpp --include=*.h --include=*.cc --include=*.hpp -l ./
+}
+
+pgrep(){
+    grep -rnIsTi "$*" --include=*.py ./
+}
+
+pgrepl(){
+    grep -rnIsTi "$*" --include=*.py -l ./
+}
+
+alias todogrep='grep -rnIsT "TODO: (\`HUT\`)"'
 
 alias gg='set -f;raw_gg';raw_gg(){ command raw_gg "$@";set +f;}
 
@@ -275,7 +309,9 @@ ma(){
     #make $1 2>&1 | grep -Ei --color "^|error"
     #make $1 2>&1 | GREP_COLORS='mt=0;31' grep -Ei --color "^|warn|error"
 
-    time make $* 2>&1 |  sed -e "s/error/\x1b[1;37;41m&\x1b[0m/" \
+    time make $* 2>&1 \
+    | tee /tmp/terminal_output \
+    |  sed -e "s/error/\x1b[1;37;41m&\x1b[0m/" \
                              -e "s/ERROR/\x1b[1;37;41m&\x1b[0m/" \
                              -e "s/Error/\x1b[1;37;41m&\x1b[0m/" \
                              -e "s/undefined reference/\x1b[1;37;41m&\x1b[0m/" \
@@ -283,7 +319,7 @@ ma(){
                              -e "s/.*not met.*/\x1b[1;37;41m&\x1b[0m/" \
                              -e "s/warn\|warning/\x1b[1;31m&\x1b[0m/" \
                              -e "s/.*success.*/\x1b[1;37m&\x1b[0m/" \
-                             -e "s/.*All constraints.*/\x1b[1;37m&\x1b[0m/"
+                             -e "s/.*All constraints.*/\x1b[1;37m&\x1b[0m/"           | head -n 40
 }
 
 # Overload cd 
@@ -315,6 +351,10 @@ fh(){
 
 #change to proj
 alias ccp='cd $proj'
+alias amke='make'
+
+# use xclip to pipe to clipboard if possible
+alias clip='xclip -selection clipboard'
 
 alias op='set -f;raw_op'
 alias oo='set -f;raw_oo'
@@ -358,10 +398,10 @@ PATH=$PATH:~/repos/scripts
 export PATH
 
 
-cl(){
-    echo -e "\e[31m Copying selection to clipboard \e[0m"
-    $(!!) | ~/workflow/xclip-master/xclip -i -selection clipboard
-}
+#cl(){
+#    echo -e "\e[31m Copying selection to clipboard \e[0m"
+#    $(!!) | ~/workflow/xclip-master/xclip -i -selection clipboard
+#}
 
 
 #This bash function will block until the given file appears or a given timeout is reached. The exit status will be 0 if the file exists;
@@ -379,4 +419,27 @@ wait_file() {
 # Source global definitions
 if [ -f /etc/bashrc ]; then
 	. /etc/bashrc
+fi
+
+# directory jumping
+function locn() {
+         if [ "$1" = "" ]
+         then
+                whereelse
+         else
+         t=`whereelse $1`
+         cd "$t"
+         fi
+}
+
+# search and replace in codebase (SO 8611822)
+#find ./ -type f -name "*.hpp" "*.cpp" -exec sed -i 's/substitution/replacement/g' {} \;
+
+
+export CXX=/usr/bin/clang++-6.0 
+export CC=/usr/bin/clang-6.0
+export PYENV_ROOT="$HOME/.pyenv"
+export PATH="$PYENV_ROOT/bin:$PATH"
+if command -v pyenv 1>/dev/null 2>&1; then
+  eval "$(pyenv init -)"
 fi

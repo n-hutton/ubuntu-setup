@@ -11,12 +11,11 @@
 "      =Status line and line numbering
 "      =Folding
 "      =Spell check, autocomplete
-"      =Registers
 "      =Misc. settings
 "      =Macros
 "      =Moving around
+"      =Terminal
 "      =Tags
-"      =Third party programs
 "      =TODO
 "      =Misc. mappings
 "      =Scratch area
@@ -30,11 +29,12 @@
 let wantSolarized          = 1
 let wantPathogen           = 1 " Req for: solarized
 let wantDoSearch           = 1 " Different search highlighting. Best with solarized
+let wantCOC                = 0
 
 " Note *** MAY HAVE TO MOD THESE FOR NEW INSTALL *** TODO: (`HUT`) : make generic
-set runtimepath=~/.vim,/etc/vim,/usr/share/vim/vimfiles/,usr/share/vim/addons/,/usr/share/vim/vim80,/usr/share/vim/vimfiles,/usr/share/vim/addons/after/,~/.vim/after
+"set runtimepath=~/.vim,/etc/vim,/usr/share/vim/vimfiles/,usr/share/vim/addons/,/usr/share/vim/vim74,/usr/share/vim/vimfiles,/usr/share/vim/addons/after/,~/.vim/after,/usr/local/share/vim/vim81,~/.vim/syntax
 
-" TODO: (HUT) : put check vir /usr/share/vim/vimXX here
+set runtimepath+=/usr/local/share/vim/vim80,/usr/share/vim/vim81
 
 " point vimruntime somewhere interesting (syntax/help stuff) *** MAY HAVE TO MOD THESE FOR NEW INSTALL *** TODO: (`HUT`) : make generic
 " TODO: (`HUT`) : change all xxxs
@@ -53,11 +53,16 @@ set cmdheight=2                " Height of the command bar
 set showmatch                  " Show matching brackets when text indicator is over them
 set mat=2                      " How many tenths of a second to blink when matching brackets
 set lazyredraw                 " Don't redraw while executing macros (good performance config)
-set nowrap                     " Don't wrap lines
+set wrap                       " Wrap lines
 set showbreak=↪\ \ 		       " string to put before wrapped screen lines
 set wildmenu                   " Turn on the WiLd menu
 set wildmode=full
 set hid                        " A buffer becomes hidden when it is abandoned
+
+" syntax is broken somehow so that it throws an error Error detected while processing function <SNR>62_Highlight_Matching_Pair:
+" TODO(HUT): fix this
+"NoMatchParen
+let loaded_matchparen = 1
 
 " Mapleader - need to have this before any leader mappings
 let mapleader   = ","
@@ -69,10 +74,9 @@ set listchars=tab:>-,trail:~,extends:>,precedes:<
 
 " Ignore compiled files etc. May be added to later depending on filetype
 set wildignore+=*.o,*~,*.pyc,*.gise,*.cmd,*.xmsgs,*isim,*.xise,*.prj,*.wdb,*.ini,*.exe,*.html,*.d
-set wildignore+=*.lsrc,*.crp,*.ngc,*.xml
+set wildignore+=*.lsrc,*.crp,*.ngc,run-d.sh,docker_ccache
 
-"set wildignore+=*\\trash\\**
-set wildignore+=*/build/*,*/cmake-build-debug/*,*/asio/*
+set wildignore+=*/build/*,*/cmake-build-debug/*,*/asio/*,*/vendor/*,*/xcodebuild/*,*/*build_*/*,*/*build-*/*,*/linalg/*,*/*_build*/*
 
 " Configure backspace so it acts as it should act
 set backspace=eol,start,indent
@@ -131,8 +135,6 @@ let g:ctrlp_prompt_mappings = {
     \ 'AcceptSelection("t")': ['<cr>', '<2-LeftMouse>'],
     \ }
 
-set mouse=a " set mouse=c to turn this off
-
 """""""""""""""""""""""""""""""""""""""""
 " EasyAlign plugin
 
@@ -156,12 +158,6 @@ let g:easy_align_delimiters = {
             \ '/' : { 'pattern': '/',
             \         'ignore_groups': ['!Comment'],
             \         'right_margin': 0},
-            \ 'a' : { 'pattern': '\(_\)',
-            \         'ignore_groups': ['!Comment'],
-            \         'right_margin': 0},
-            \ 'b' : { 'pattern': '\(x\)',
-            \         'ignore_groups': ['!Comment'],
-            \         'right_margin': 0},
             \ ';' : { 'pattern': ';',
             \         'ignore_groups': ['Comment'],
             \         'stick_to_left': 1,
@@ -172,9 +168,6 @@ let g:easy_align_delimiters = {
 """""""""""""""""""""""""""""""""""""""""
 " Syntastic plugin
 nnoremap <leader>e :Errors<Cr><C-W>j
-
-" Lint the file, populate quickfix list
-nnoremap <leader>g :cexpr! system('/usr/bin/cpplint.py '.expand('%:p'))<Cr>:cwindow<Cr>
 
 let g:syntastic_always_populate_loc_list = 1
 let g:syntastic_auto_loc_list            = 2 " When set to 2 the error window will be automatically closed when there are no errors
@@ -202,17 +195,162 @@ let g:syntastic_vhdl_vcom_args += "-lint"
 "let g:syntastic_vhdl_vcom_tail = "2>&1 | grep -v \"vcom-1239\""                   " Pipe the output of vcom into a program that will try and handle/solve the errors
 "let g:syntastic_vhdl_vcom_tail = "2>&1 | test_out"
 
-"""""""""""""""""""""""""""""""""""""""""
-" Snippet plugins
+let g:syntastic_disabled_filetypes=['python']
+let g:syntastic_disabled_filetypes=['bash']
 
-" Trigger configuration. Do not use <tab> if you use https://github.com/Valloric/YouCompleteMe.
-let g:UltiSnipsExpandTrigger="<tab>"
-let g:UltiSnipsJumpForwardTrigger="<c-b>"
-let g:UltiSnipsJumpBackwardTrigger="<c-z>"
+let g:syntastic_python_checkers=['']
+
+"""""""""""""""""""""""""""""""""""""""""
+" CurtineIncSw plugin
+" plugin to switch between header and source file
+
+nnoremap <leader>h :call CurtineIncSw()<CR>
+
+" Toggling between headers for filetypes - old way only worked for header in the same directory
+" autocmd FileType * :nnoremap <leader>h :e <c-r>=expand('%:p')<Cr>
+
+"""""""""""""""""""""""""""""""""""""""""
+" COC plugin
 "
+
+if(g:wantCOC)
+    call plug#begin('~/.vim/plugged')
+
+    Plug 'neoclide/coc.nvim', {'tag': '*', 'do': { -> coc#util#install()}}
+
+    call plug#end()
+
+    " if hidden not set, TextEdit might fail.
+    set hidden
+
+    " Better display for messages
+    set cmdheight=2
+
+    " Smaller updatetime for CursorHold & CursorHoldI
+    set updatetime=300
+
+    " don't give |ins-completion-menu| messages.
+    set shortmess+=c
+
+    " always show signcolumns
+    set signcolumn=yes
+
+    " Use tab for trigger completion with characters ahead and navigate.
+    " Use command ':verbose imap <tab>' to make sure tab is not mapped by other plugin.
+    inoremap <silent><expr> <TAB>
+          \ pumvisible() ? "\<C-n>" :
+          \ <SID>check_back_space() ? "\<TAB>" :
+          \ coc#refresh()
+    inoremap <expr><S-TAB> pumvisible() ? "\<C-p>" : "\<C-h>"
+
+    function! s:check_back_space() abort
+      let col = col('.') - 1
+      return !col || getline('.')[col - 1]  =~# '\s'
+    endfunction
+
+    " Use <c-space> for trigger completion.
+    inoremap <silent><expr> <c-space> coc#refresh()
+
+    " Use <cr> for confirm completion, `<C-g>u` means break undo chain at current position.
+    " Coc only does snippet and additional edit on confirm.
+    inoremap <expr> <cr> pumvisible() ? "\<C-y>" : "\<C-g>u\<CR>"
+
+    " Use `[c` and `]c` for navigate diagnostics
+    nmap <silent> [c <Plug>(coc-diagnostic-prev)
+    nmap <silent> ]c <Plug>(coc-diagnostic-next)
+
+    " Remap keys for gotos
+    nmap <silent> gd <Plug>(coc-definition)
+    nmap <silent> gy <Plug>(coc-type-definition)
+    nmap <silent> gi <Plug>(coc-implementation)
+    nmap <silent> gr <Plug>(coc-references)
+
+    " Use K for show documentation in preview window
+    nnoremap <silent> K :call <SID>show_documentation()<CR>
+
+    function! s:show_documentation()
+      if &filetype == 'vim'
+        execute 'h '.expand('<cword>')
+      else
+        call CocAction('doHover')
+      endif
+    endfunction
+
+    " Highlight symbol under cursor on CursorHold
+    autocmd CursorHold * silent call CocActionAsync('highlight')
+
+    " Remap for rename current word
+    nmap <leader>rn <Plug>(coc-rename)
+
+    " Remap for format selected region
+    vmap <leader>f  <Plug>(coc-format-selected)
+    nmap <leader>f  <Plug>(coc-format-selected)
+
+    augroup mygroup
+      autocmd!
+      " Setup formatexpr specified filetype(s).
+      autocmd FileType typescript,json setl formatexpr=CocAction('formatSelected')
+      " Update signature help on jump placeholder
+      autocmd User CocJumpPlaceholder call CocActionAsync('showSignatureHelp')
+    augroup end
+
+    " Remap for do codeAction of selected region, ex: `<leader>aap` for current paragraph
+    vmap <leader>a  <Plug>(coc-codeaction-selected)
+    nmap <leader>a  <Plug>(coc-codeaction-selected)
+
+    " Remap for do codeAction of current line
+    nmap <leader>ac  <Plug>(coc-codeaction)
+    " Fix autofix problem of current line
+    nmap <leader>qf  <Plug>(coc-fix-current)
+
+    " Use `:Format` for format current buffer
+    command! -nargs=0 Format :call CocAction('format')
+
+    " Use `:Fold` for fold current buffer
+    command! -nargs=? Fold :call     CocAction('fold', <f-args>)
+
+
+    " Add diagnostic info for https://github.com/itchyny/lightline.vim
+    let g:lightline = {
+          \ 'colorscheme': 'wombat',
+          \ 'active': {
+          \   'left': [ [ 'mode', 'paste' ],
+          \             [ 'cocstatus', 'readonly', 'filename', 'modified' ] ]
+          \ },
+          \ 'component_function': {
+          \   'cocstatus': 'coc#status'
+          \ },
+          \ }
+
+
+
+    " Using CocList
+    " Show all diagnostics
+    nnoremap <silent> <space>a  :<C-u>CocList diagnostics<cr>
+    " Manage extensions
+    nnoremap <silent> <space>e  :<C-u>CocList extensions<cr>
+    " Show commands
+    nnoremap <silent> <space>c  :<C-u>CocList commands<cr>
+    " Find symbol of current document
+    nnoremap <silent> <space>o  :<C-u>CocList outline<cr>
+    " Search workspace symbols
+    nnoremap <silent> <space>s  :<C-u>CocList -I symbols<cr>
+    " Do default action for next item.
+    nnoremap <silent> <space>j  :<C-u>CocNext<CR>
+    " Do default action for previous item.
+    nnoremap <silent> <space>k  :<C-u>CocPrev<CR>
+    " Resume latest coc list
+    nnoremap <silent> <space>p  :<C-u>CocListResume<CR>
+
+endif
 
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " =============Colours=============
+
+" Syntax highlighting
+"au BufRead,BufNewFile *.fetch set filetype=etch
+"au BufRead,BufNewFile *.fetch setfiletype cel
+"au BufRead,BufNewFile *.fetch set filetype=etch
 
 " Choose colorscheme - solarized or desert
 if(!exists("g:haveSetColourScheme"))
@@ -258,9 +396,9 @@ nnoremap <silent> N Nzz
 nnoremap <silent> * *zz
 nnoremap <silent> # #zz
 
-" quickly search/replace word under cursor // TODO: (`HUT`) : make this not blast the reg
-nnoremap <leader>s "9yiw:%s/\<<C-r><C-9>\>/<C-r><C-9>
-vnoremap <leader>s "9y:%s/<C-r><C-9>/<C-r><C-9>
+" quickly search/replace word under cursor
+nnoremap <leader>s "9yiw:let@"="<c-r><c-0>"<Cr>:%s/<C-r><C-9>/<C-r><C-9>
+vnoremap <leader>s "9y:let@"="<c-r><c-0>"<Cr>:%s/<C-r><C-9>/<C-r><C-9>
 
 "Modified search function has slightly more intelligent highlighting
 if(g:wantDoSearch)
@@ -343,7 +481,6 @@ cnoremap q1 q!
 
 " Open the file under the cursor (relative to file's working directory!)
 nnoremap <leader>o yiW:tabe %:h/<C-r><C-"><Cr>
-vnoremap <leader>o y:tabe %:h/<C-r><C-"><Cr>
 
 "Check current buffer is saved and put vim into background 
 nnoremap <leader>v :call CheckSavedBuffer()<cr><C-z>
@@ -362,7 +499,6 @@ autocmd FileType cpp      set list
 autocmd FileType c        set list
 
 autocmd BufRead,BufNewFile *.mrp set nowrap
-autocmd BufRead,BufNewFile *.tex set wrap
 
 "autocmd BufRead,BufNewFile *.mrp set foldmethod=indent
 "autocmd BufRead,BufNewFile *.mrp set tabstop=2
@@ -376,9 +512,6 @@ autocmd BufRead,BufNewFile *.tex set wrap
 
 autocmd BufRead,BufNewFile *.srp set nowrap
 autocmd BufRead,BufNewFile *.twr set nowrap
-
-" Toggling between headers for filetypes
-autocmd FileType * :nnoremap <leader>h :e <c-r>=expand('%:p')<Cr>
 
 " Keep undo history
 " This, like swap and backups, uses .vim-undo first, then ~/.vim/undo
@@ -439,9 +572,6 @@ endfunc
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " =============Indent=============
 
-" show our current column max
-set colorcolumn=101
-
 set ai "Auto indent
 "set si "Smart indent
 "set indentexpr
@@ -473,14 +603,13 @@ vnoremap > >>gv
 
 "Note: set expandtab<cr>:retab!<cr> will turn tabs to spaces
 
-" Filetype specific
 " Note: find out what the filetype is with :set filetype?
 "Default tab expansion for 
-autocmd FileType *        set tabstop=2| set shiftwidth=2| set expandtab    | set smarttab
+autocmd FileType *        set tabstop=4| set shiftwidth=4| set expandtab    | set smarttab
 autocmd FileType snippets set tabstop=2| set shiftwidth=2| set noexpandtab
 autocmd FileType tcl      set tabstop=2| set shiftwidth=2| set smarttab     | set expandtab
 autocmd FileType cpp      set tabstop=2| set shiftwidth=2| set smarttab
-autocmd FileType c        set tabstop=2| set shiftwidth=2| set smarttab
+autocmd FileType c        set tabstop=2| set shiftwidth=2| set noexpandtab
 autocmd FileType vhdl     set tabstop=2| set shiftwidth=2| set smarttab
 autocmd FileType markdown set tabstop=4| set shiftwidth=4| set noexpandtab
 autocmd FileType make     set tabstop=4| set shiftwidth=4| set noexpandtab
@@ -520,41 +649,12 @@ nnoremap <C-p> gt
 nnoremap <C-t> <C-w>-
 nnoremap <C-y> <C-w>+
 
-function! WinDo(command)
-  let currwin=winnr()
-  execute 'windo ' . a:command
-  execute currwin . 'wincmd w'
-endfunction
-com! -nargs=+ -complete=command Windo call WinDo(<q-args>)
-
-function! TabDo(command)
-  let save_tab = tabpagenr()
-  let save_win = winnr()
-  tabdo command
-  exe "tabnext" save_tab
-  exe save_win "wincmd w"
-endfunction
-com! -nargs=+ -complete=command Windo call WinDo(<q-args>)
-
-"make without having to drop to terminal, populate quickfix list TODO: (`HUT`) : move/delete
-"nnoremap <leader>f :w<cr>:!clear<Cr><Cr>:!./.runProgram.sh \| cwindow<Cr><Cr>
-"nnoremap <leader>f :w<Cr>:Tabdo(windo cclose)<Cr>:cexpr! system('./.runProgram.sh '.expand('%:p'))<Cr>:cwindow<Cr>
-nnoremap <leader>f :w<Cr>:tabdo windo cclose<Cr>:cexpr! system('./.runProgram.sh '.expand('%:p'))<Cr>:cwindow<Cr>
-nnoremap <leader>F :w<Cr>:cexpr! system('./.runProgram.sh '.expand('%:p'))<Cr>:cwindow<Cr>
-
-"" Set wrapping in quickfix window
-"augroup quickfix
-"    autocmd!
-"    autocmd FileType qf setlocal wrap
-"augroup END
-
 "Trawl through errors
 nnoremap <leader>n :cn<cr>
 
 au BufReadPost quickfix  setlocal modifiable
         \ | silent exe 'g/^||/s//>'
         \ | setlocal nomodifiable
-        \ | setlocal wrap
 
 "nnoremap <leader>d :echom hello
 
@@ -565,8 +665,7 @@ map <leader>tc :tabclose<cr>
 map <leader>tm :tabmove
 
 "change buffers quickly
-"nmap <leader>b :ls<CR>:buffer<Space>
-nmap <leader>b :! git blame <c-r>=expand("%")<Cr>
+nmap <leader>b :ls<CR>:buffer<Space>
 
 " Opens a new tab with the current buffer's path
 " Super useful when editing files in the same directory
@@ -685,39 +784,28 @@ set statusline+=%*
 
 "folding settings
 "set foldmethod=indent "fold based on indent
+"set foldmethod=syntax "fold based on indent
 "set foldnestmax=3 "deepest fold is 3 levels
-
-set foldmethod=syntax "fold based on indent
-set nofoldenable "don't fold by default
-" Toggle folds on/off
-"nnoremap <leader>c zi
-
-"Search only in open text
-"set fdo-=search
-
-"Set colour
-hi Folded ctermbg=8
+""set nofoldenable "don't fold by default
 
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " =============Spell check, autocomplete=============
+"
+" Cheat sheet:
+" zg - add word to dictionary
+" <leader>z - autocorrect to best match
+
+" Default to having spelling enabled
+set spell spelllang=en_gb
 
 "Ignore all the cruft when searching with certain filetypes
 autocmd FileType vhdl set wildignore+=iseconfig\/,_xmsgs\/,ipcore_dir\/
 
+nnoremap <leader>z z=1<Cr><Cr>
+
 " Pressing ,ss will toggle and untoggle spell checking
 map <leader>ss :setlocal spell!<cr>
 "set complete-=i     " Searching includes can be slow
-
-" Use custom spellfile
-set spell spellfile=~/.vim/spell/nh.utf-8.add
-
-" Note, to add to spellfile, zg
-
-hi clear SpellBad
-hi SpellBad cterm=underline
-
-" Choose first spell option
-nnoremap <leader>z 1z=
 
 "spell check when writing commit logs
 autocmd filetype svn,*commit*,text setlocal spell
@@ -748,24 +836,6 @@ function! Tab_Or_Complete()
 endfunction
 
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-" =============Registers=============
-
-"set clipboard=unnamed	       " Yank to the system clipboard by default
-set clipboard=unnamedplus      " Yank to the system clipboard by default (only vim 7.3.34 or higher)
-
-" Push to xclip program in the case vim -> clip doesn't work normally
-
-"nnoremap <leader>y :!rm -f ~/.clipboard<Cr><Cr>:redir! > ~/.clipboard<Cr>:echon @"<Cr>:redir END<Cr>
-
-" TODO: (`HUT`) : consider putting this in third-party options
-" TODO: (`HUT`) : make this work
-nnoremap <leader>y :execute ":!echo " . getreg('"') . " \| clip"
-
-"noremap <leader>y :!rm -f ~/.clipboard<Cr><Cr>:redir! > ~/.clipboard<Cr>:echon @"<Cr>:redir END<Cr>
-nnoremap <leader>p :-1r ~/.clipboard<Cr>
-
-
-"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " =============Misc. settings=============
 
 filetype plugin indent on      " Required!
@@ -776,6 +846,7 @@ set encoding=utf8              " Set utf8 as standard encoding and en_US as the 
 set ffs=unix,dos,mac           " Use Unix as the standard file type
 set lbr                        " Linebreak on 500 characters
 set tw=500
+set clipboard=unnamed	       " Yank to the system clipboard by default
 
 "disable paste mode when leaving normal mode
 au InsertLeave * set nopaste
@@ -805,6 +876,9 @@ endfunction
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " =============Moving around=============
 
+" Enable clicking. Note: turn off with set mouse=c
+set mouse=a
+
 "beginning of line and end of line quickly (operator-pending as well)
 noremap H ^
 onoremap H ^
@@ -812,7 +886,7 @@ onoremap H ^
 " TODO: (`HUT`) : improve this a lot
 nnoremap J :echo "CAPS LOCK?"<cr>}jzz
 nnoremap K :echo "CAPS LOCK?"<cr>{kzz
-vnoremap J /\v(^$\|%$)<Cr>
+vnoremap J /^$<Cr>
 vnoremap K ?^$<Cr>
 
 "Don't want to select the end of line in visual mode
@@ -868,20 +942,31 @@ function! CompareVsplit(direction)
 endfunction
 
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" =============Terminal=============
+
+" Mappings/settings for vim8+ terminal :term
+
+" Moving between splits
+tnoremap <C-j> <C-W>j
+tnoremap <C-k> <C-W>k
+tnoremap <C-h> <C-W>h
+tnoremap <C-l> <C-W>l
+
+"quitting
+tnoremap <leader>q <C-D>
+
+"Toggle terminal
+"nnoremap <leader>f :terminal<Cr>
+tnoremap <leader>f <C-C><C-D>
+
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " =============Tags=============
 
 " Override ctrl-} behaviour to open a new window with the tag
 nnoremap } <C-w><C-]><C-w>T
-nnoremap { <C-w><C-]>
 nnoremap ] *<C-]>0hn
 
-"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-" =============Third party progams=============
-"nnoremap <leader>1 :!eclipse --launcher.openFile %:p && wmctrl -a eclipse<Cr><Cr>
-"nnoremap <leader>1 :!clion --line 5 %:p && wmctrl -a clion<Cr><Cr>
-
-nnoremap <leader>1 :execute ":!~/Desktop/clion.sh --line " . line('.') . " %:p && wmctrl -a clion"<CR><CR>
-
+nnoremap { g<C-]>
 
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " =============TODO=============
@@ -905,8 +990,6 @@ endfunction
 "keeps the text in the default reg when pasting in visual mode - WHY IS THIS NOT WORKING
 function! RestoreRegister()
   let @" = s:restore_reg
-  let @+ = s:restore_reg
-  let @* = s:restore_reg
   return ''
 endfunction
 
@@ -951,10 +1034,6 @@ command! -nargs=* -complete=shellcmd R new | setlocal buftype=nofile bufhidden=h
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " =============Misc. mappings=============
 
-" Typos
-command! -bar Join :join
-cnoremap tbae tabe
-
 "Use :Invert to invert the background from dark to light
 command! -bar Invert :let &background = (&background=="light"?"dark":"light")
 
@@ -967,8 +1046,11 @@ inoremap kj <Esc>
 snoremap kj <Esc>B
 
 "Auto-caps to-do
-iabbrev todo TODO: (HUT) :
-iabbrev Todo TODO: (HUT) :
+iabbrev todo TODO(HUT):
+iabbrev Todo TODO(HUT):
+
+noremap <leader>y :!rm -f ~/.clipboard<Cr><Cr>:redir! > ~/.clipboard<Cr>:echon @"<Cr>:redir END<Cr>
+nnoremap <leader>p :-1r ~/.clipboard<Cr>
 
 "noremap Y :call system('tee ~/clip', @0)<Cr>
 
@@ -976,8 +1058,8 @@ iabbrev Todo TODO: (HUT) :
 iabbrev zn \n
 
 "Faster command-mode manipulation, quick reg access, fast history search
-cnoremap <leader>r <C-r><C-0>
-"vnoremap <leader>r <C-r><C-0>
+cnoremap <leader>r <C-r><C-">
+"vnoremap <leader>r <C-r><C-">
 cnoremap <C-J> <Down>
 cnoremap <C-K> <Up>
 cnoremap <C-L> <Right>
@@ -1232,7 +1314,7 @@ vnoremap _ yA <= (others => '0');<Esc>
 nnoremap _ yiWA <= (others => '0');<Esc>
 
 " quick reg copy
-"nnoremap <leader>1 yypwea_r<Esc>ldldl
+nnoremap <leader>1 yypwea_r<Esc>ldldl
 
 " Quick vhdl port map to entity swap
 " '<,'>s/\v(\w+)\s+:.*/\1 => \1,/gc
@@ -1283,6 +1365,9 @@ function! WhatVisualMode()
         echo 'argh'
     endif
 endfunction 
+
+"nnoremap <leader>z :%g/0000000/d<cr>:%s/.*: 0000//<cr>
+"nnoremap <leader>a :%s/.*: 0000//<cr>:nunmap J<cr>:%g/./normal J<Cr>:%g!/ 0001/d<Cr>:%s/ 0001//<cr>
 
 nnoremap <leader>a :call FormatFile()<Cr>
 "colorscheme desert
@@ -1432,3 +1517,52 @@ endfunction
 function! MoveToLine(prepend_command)
     call feedkeys(a:prepend_command."20gg")
 endfunction;
+
+" This callback will be executed when the entire command is completed
+function! BackgroundCommandClose(channel)
+  " Read the output from the command into the quickfix window
+  execute "cfile! " . g:backgroundCommandOutput
+  " Open the quickfix window
+  copen
+  " Jump back to the main window
+  wincmd p
+  unlet g:backgroundCommandOutput
+endfunction
+
+function! RunBackgroundCommand(command)
+  " Make sure we're running VIM version 8 or higher.
+  if v:version < 800
+    echoerr 'RunBackgroundCommand requires VIM version 8 or higher'
+    return
+  endif
+
+  if exists('g:backgroundCommandOutput')
+    echom 'Already running task in background'
+    sleep 2
+  else
+    echo 'Running task in background'
+    " Launch the job.
+    " Notice that we're only capturing out, and not err here. This is because, for some reason, the callback
+    " will not actually get hit if we write err out to the same file. Not sure if I'm doing this wrong or?
+    let g:backgroundCommandOutput = tempname()
+
+    echom(a:command)
+
+    call job_start(a:command, {'close_cb': 'BackgroundCommandClose', 'out_io': 'file', 'out_name': g:backgroundCommandOutput})
+  endif
+endfunction
+
+" So we can use :BackgroundCommand to call our function.
+command! -nargs=+ -complete=shellcmd RunBackgroundCommand call RunBackgroundCommand(<q-args>)
+
+" Function to search for phrase in project 
+"nnoremap <leader>f :w<Cr>:call CloseCopen()<Cr>:RunBackgroundCommand ./vim_helper.sh 
+nnoremap <leader>f :w<Cr>:call CloseCopen()<Cr>:RunBackgroundCommand ./run_build.sh<Cr>
+
+function! CloseCopen()
+    let save_tab = tabpagenr()
+    let save_win = winnr()
+    tabdo cclose
+    exe "tabnext" save_tab
+    exe save_win "wincmd w" 
+endfunction

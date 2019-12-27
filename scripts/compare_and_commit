@@ -1,0 +1,62 @@
+#!/usr/bin/env python3
+
+import ipdb
+import argparse
+import subprocess
+import time
+import os
+
+def parse_commandline():
+    parser = argparse.ArgumentParser()
+    #parser.add_argument('host', help='The host name to perform the checks on')
+    #parser.add_argument('-p', '--port', default=8000, type=int, help='The port number to connect to')
+    return parser.parse_args()
+
+def main():
+    args = parse_commandline()
+
+    script_dir  = os.path.dirname(os.path.realpath(__file__))
+    working_dir = os.getcwd()
+
+    print(working_dir)
+    print(script_dir)
+
+    proc = subprocess.Popen(["git", "status", "--porcelain", "-uno"], stdout=subprocess.PIPE, stderr=subprocess.STDOUT, cwd=working_dir )
+    while True:
+        line = proc.stdout.readline().decode()
+
+        if line == '':
+            break
+
+        file_name = line.split(' ')[-1]
+        file_name = file_name.split('\n')[0]
+
+        print(file_name)
+        print()
+
+        proc2 = subprocess.Popen(["git", "difftool", "--tool=p4merge", "--no-prompt", "./{}".format(file_name)], stdout=subprocess.PIPE, stderr=subprocess.STDOUT, cwd=working_dir )
+
+        # Wait for gui program to close
+        proc2.wait()
+
+        # Focus the terminal (mac only)
+        proc3 = subprocess.Popen(["osascript", "/Users/nhutton/repos/ubuntu-setup/scripts/focus_terminal_window"], stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+
+        input_text = input("Add (a), Reset (r), None (\\r)")
+
+        input_text = input_text.lower()
+
+        if input_text == 'a':
+            temp_proc = subprocess.Popen(["git", "add", file_name], stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+            temp_proc.wait()
+            print("Added file")
+
+        if input_text == 'r':
+            temp_proc = subprocess.Popen(["git", "checkout", "HEAD", "--", file_name], stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+            temp_proc.wait()
+            print("Reset file")
+
+        print("==========================================")
+
+if __name__ == '__main__':
+    main()

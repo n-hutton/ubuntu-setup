@@ -1,69 +1,69 @@
-echo "------------------------------------"
-echo "Intended changes:"
-echo "copy .vimrc"
-echo "copy .bashrc"
-echo "Change color template for shell and vim [Remember to save terminal profile first]" 
-echo "copy .vim/"
-echo "------------------------------------"
-
-#############################################################
-# Import vimrc, plugins etc
-
-while true; do
-    read -p "Update plugins etc. from internet?" yn
-    case $yn in
-        [Yy]* ) git pull;
-		rm -f pathogen.vim;
-                wget https://tpo.pe/pathogen.vim;
-		mv pathogen.vim ./vim_files;
-		echo "Completed updating files";
-                break;;
-        [Nn]* ) echo "ok";break;;
-        * ) echo "Please answer yes or no.";;
-    esac
-done
-
-#############################################################
-# import bashrc
-echo "Do you want to install the .bashrc file?"
-read BASHRC_INSTALL
-
-if [ $BASHRC_INSTALL == "y" ]
-then
-    cp ./config_files/.bashrc ~/
-fi
-#############################################################
-
-#############################################################
-# Import vimrc, plugins etc
-
-while true; do
-    read -p "Copy .vimrc?" yn
-    case $yn in
-        [Yy]* ) cp ./vim_files/.vimrc ~/;break;;
-        [Nn]* ) echo "ok";break;;
-        * ) echo "Please answer yes or no.";;
-    esac
-done
-
-#############################################################
-echo "Copy vim plugins?"
-read VIMRC_INSTALL
-
-if [ $VIMRC_INSTALL == "y" ]
-then
-    mkdir -p ~/.vim/autoload ~/.vim/bundle 
-    cp vim_files/pathogen.vim ~/.vim/autoload/pathogen.vim
-    cd ~/.vim/bundle
-    git clone https://github.com/ctrlpvim/ctrlp.vim
-    git clone https://github.com/vim-syntastic/syntastic
-    git clone https://github.com/junegunn/vim-easy-align
-    git clone https://github.com/vim-syntastic/syntastic
-    git clone https://github.com/ervandew/supertab
-    git clone https://github.com/SirVer/ultisnips
-    git clone https://github.com/honza/vim-snippets
-fi
-#############################################################
+#echo "------------------------------------"
+#echo "Intended changes:"
+#echo "copy .vimrc"
+#echo "copy .bashrc"
+#echo "Change color template for shell and vim [Remember to save terminal profile first]" 
+#echo "copy .vim/"
+#echo "------------------------------------"
+#
+##############################################################
+## Import vimrc, plugins etc
+#
+#while true; do
+#    read -p "Update plugins etc. from internet?" yn
+#    case $yn in
+#        [Yy]* ) git pull;
+#		rm -f pathogen.vim;
+#                wget https://tpo.pe/pathogen.vim;
+#		mv pathogen.vim ./vim_files;
+#		echo "Completed updating files";
+#                break;;
+#        [Nn]* ) echo "ok";break;;
+#        * ) echo "Please answer yes or no.";;
+#    esac
+#done
+#
+##############################################################
+## import bashrc
+#echo "Do you want to install the .bashrc file?"
+#read BASHRC_INSTALL
+#
+#if [ $BASHRC_INSTALL == "y" ]
+#then
+#    cp ./config_files/.bashrc ~/
+#fi
+##############################################################
+#
+##############################################################
+## Import vimrc, plugins etc
+#
+#while true; do
+#    read -p "Copy .vimrc?" yn
+#    case $yn in
+#        [Yy]* ) cp ./vim_files/.vimrc ~/;break;;
+#        [Nn]* ) echo "ok";break;;
+#        * ) echo "Please answer yes or no.";;
+#    esac
+#done
+#
+##############################################################
+#echo "Copy vim plugins?"
+#read VIMRC_INSTALL
+#
+#if [ $VIMRC_INSTALL == "y" ]
+#then
+#    mkdir -p ~/.vim/autoload ~/.vim/bundle 
+#    cp vim_files/pathogen.vim ~/.vim/autoload/pathogen.vim
+#    cd ~/.vim/bundle
+#    git clone https://github.com/ctrlpvim/ctrlp.vim
+#    git clone https://github.com/vim-syntastic/syntastic
+#    git clone https://github.com/junegunn/vim-easy-align
+#    git clone https://github.com/vim-syntastic/syntastic
+#    git clone https://github.com/ervandew/supertab
+#    git clone https://github.com/SirVer/ultisnips
+#    git clone https://github.com/honza/vim-snippets
+#fi
+##############################################################
 
 #############################################################
 #Change color template

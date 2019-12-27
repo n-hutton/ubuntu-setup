@@ -1,0 +1,5 @@
+tell application "System Events" to tell process "iTerm2"
+    set frontmost to true
+    #windows where title contains "bash"
+    #if result is not {} then perform action "AXRaise" of item 1 of result
+end tell

@@ -74,9 +74,9 @@ set listchars=tab:>-,trail:~,extends:>,precedes:<
 
 " Ignore compiled files etc. May be added to later depending on filetype
 set wildignore+=*.o,*~,*.pyc,*.gise,*.cmd,*.xmsgs,*isim,*.xise,*.prj,*.wdb,*.ini,*.exe,*.html,*.d
-set wildignore+=*.lsrc,*.crp,*.ngc,run-d.sh,docker_ccache
+set wildignore+=*.lsrc,*.crp,*.ngc,run-d.sh,docker_ccache,node_modules
 
-set wildignore+=*/build/*,*/cmake-build-debug/*,*/asio/*,*/vendor/*,*/xcodebuild/*,*/*build_*/*,*/*build-*/*,*/linalg/*,*/*_build*/*
+set wildignore+=*/build/*,*/cmake-build-debug/*,*/asio/*,*/vendorr/*,*/xcodebuild/*,*/*build_*/*,*/*build-*/*,*/linalg/*,*/*_build*/*
 
 " Configure backspace so it acts as it should act
 set backspace=eol,start,indent
@@ -96,6 +96,8 @@ endif
 
 """""""""""""""""""""""""""""""""""""""""
 " CTRLP plugin
+
+set maxmempattern=5000
 
 "Let's use ctrl-f to find files - note it triggers from current working dir
 let g:ctrlp_map = '<c-f>'
@@ -343,6 +345,85 @@ if(g:wantCOC)
     nnoremap <silent> <space>p  :<C-u>CocListResume<CR>
 
 endif
+
+"""""""""""""""""""""""""""""""""""""""""
+" LanguageClient-neovim
+"
+
+" Required for operations modifying multiple buffers like rename.
+set hidden
+
+let g:LanguageClient_serverCommands = {
+    \ 'rust': ['~/.cargo/bin/rustup', 'run', 'stable', 'rls'],
+    \ 'javascript': ['/usr/local/bin/javascript-typescript-stdio'],
+    \ 'javascript.jsx': ['tcp://127.0.0.1:2089'],
+    \ 'python': ['/usr/local/bin/pyls'],
+    \ 'ruby': ['~/.rbenv/shims/solargraph', 'stdio'],
+    \ 'go': ['go-langserver'],
+    \ }
+
+nnoremap <F6> :call LanguageClient_contextMenu()<CR>
+" Or map each action separately
+nnoremap <silent> Z :call LanguageClient#textDocument_hover()<CR>
+nnoremap <silent> gd :call LanguageClient#textDocument_definition()<CR>
+nnoremap <silent> <F2> :call LanguageClient#textDocument_rename()<CR>
+
+" Do not use tags to jump to definitions, instead use LanguageClient
+nnoremap ] :call LanguageClient#textDocument_definition()<CR>
+
+set runtimepath+=~/.vim/manually_installed/LanguageClient-neovim
+
+"https://www.reddit.com/r/vim/comments/b33lc1/a_guide_to_lsp_auto_completion_in_vim/
+let g:LanguageClient_autoStart = 1
+
+" We don't want our quickfix list always spammed with diagnostics
+let g:LanguageClient_diagnosticsList = 'Disabled'
+
+"let g:LanguageClient_serverCommands = {
+"  \ 'cpp': ['clangd'],
+"  \ }
+
+let g:mucomplete#completion_delay = 1
+"let g:mucomplete#completion_delay = 500
+"let g:mucomplete#reopen_immediately = 0
+
+"if executable('cquery')
+"     " Let the client know that for c and cpp files, use cquery.
+"     let g:LanguageClient_serverCommands = {
+"        \ 'c':   ['cquery', '--log-file=/tmp/vim-cquery.log',
+"        \         '--init={"cacheDirectory":"$HOME/.cquery-cache"}'],
+"        \ 'cpp': ['cquery', '--log-file=/tmp/vim-cquery.log',
+"        \         '--init={"cacheDirectory":"$HOME/.cquery-cache"}'],
+"        \ }
+"endif
+
+"nnoremap z :call LanguageClient_contextMenu()<CR>
+
+inoremap <silent><expr> <c-space> LanguageClient#textDocument_completion()
+"inoremap <silent><expr> <leader>q <C-R>=LanguageClient#textDocument_completion()<Cr>
+
+"""""""""""""""""""""""""""""""""""""""""
+" mu-complete
+" From https://www.reddit.com/r/vim/comments/b33lc1/a_guide_to_lsp_auto_completion_in_vim/
+" Mandatory options for plugin to work
+set completeopt+=menuone
+set completeopt+=noselect
+
+" Note: this is vim-specific (doesn't matter if mu-complete is enabled), and it stops a preview window
+" popping up when you tab complete.
+" https://github.com/Shougo/neocomplete.vim/issues/472
+set completeopt-=preview
+
+" Shut off completion messages
+set shortmess+=c
+" prevent a condition where vim lags due to searching include files.
+set complete-=i
+let g:mucomplete#enable_auto_at_startup = 1
+" :help mucomplete#chains for more details
+let g:mucomplete#chains = {}
+let g:mucomplete#chains.default  = ['path', 'omni', 'keyn', 'dict', 'uspl', 'ulti']
+let g:mucomplete#chains.markdown = ['path', 'keyn', 'dict', 'uspl']
+let g:mucomplete#chains.vim      = ['path', 'keyn', 'dict', 'uspl']
 
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " =============Colours=============
@@ -605,14 +686,18 @@ vnoremap > >>gv
 
 " Note: find out what the filetype is with :set filetype?
 "Default tab expansion for 
-autocmd FileType *        set tabstop=4| set shiftwidth=4| set expandtab    | set smarttab
-autocmd FileType snippets set tabstop=2| set shiftwidth=2| set noexpandtab
-autocmd FileType tcl      set tabstop=2| set shiftwidth=2| set smarttab     | set expandtab
-autocmd FileType cpp      set tabstop=2| set shiftwidth=2| set smarttab
-autocmd FileType c        set tabstop=2| set shiftwidth=2| set noexpandtab
-autocmd FileType vhdl     set tabstop=2| set shiftwidth=2| set smarttab
-autocmd FileType markdown set tabstop=4| set shiftwidth=4| set noexpandtab
-autocmd FileType make     set tabstop=4| set shiftwidth=4| set noexpandtab
+autocmd FileType *                    set tabstop=4| set shiftwidth=4| set expandtab    | set smarttab
+autocmd FileType snippets             set tabstop=2| set shiftwidth=2| set noexpandtab
+autocmd FileType tcl                  set tabstop=2| set shiftwidth=2| set smarttab     | set expandtab
+autocmd FileType cpp                  set tabstop=2| set shiftwidth=2| set smarttab
+autocmd FileType c                    set tabstop=2| set shiftwidth=2| set noexpandtab
+autocmd FileType vhdl                 set tabstop=2| set shiftwidth=2| set smarttab
+autocmd FileType markdown             set tabstop=4| set shiftwidth=4| set noexpandtab
+autocmd FileType make                 set tabstop=4| set shiftwidth=4| set noexpandtab
+autocmd FileType go                   set tabstop=2| set shiftwidth=2| set noexpandtab
+autocmd FileType vim                  set tabstop=2| set shiftwidth=2| set smarttab
+autocmd FileType typescriptreact      set tabstop=2| set shiftwidth=2| set smarttab
+autocmd FileType typescript           set tabstop=2| set shiftwidth=2| set smarttab
 
 " Make vhdl auto-indent the same as other languages
 let g:vhdl_indent_genportmap = 0
@@ -656,6 +741,12 @@ au BufReadPost quickfix  setlocal modifiable
         \ | silent exe 'g/^||/s//>'
         \ | setlocal nomodifiable
 
+" Set quickfix/copen to not wrap
+augroup quickfix
+    autocmd!
+    autocmd FileType qf setlocal nowrap
+augroup END
+
 "nnoremap <leader>d :echom hello
 
 " Possibly useful mappings for managing tabs
@@ -665,7 +756,7 @@ map <leader>tc :tabclose<cr>
 map <leader>tm :tabmove
 
 "change buffers quickly
-nmap <leader>b :ls<CR>:buffer<Space>
+"nmap <leader>b :ls<CR>:buffer<Space>
 
 " Opens a new tab with the current buffer's path
 " Super useful when editing files in the same directory
@@ -817,8 +908,9 @@ autocmd filetype svn,*commit*,text setlocal spell
 "
 
 "Lets get some supertab stuff on the go - want to just use nice old user complete rather than fancy omni etc.
-"let g:SuperTabDefaultCompletionType = "context"
-let g:SuperTabDefaultCompletionType = "<c-n>"
+let g:SuperTabDefaultCompletionType = "context"
+let g:SuperTabContextDefaultCompletionType = "<c-n>"
+"let g:SuperTabDefaultCompletionType = "<c-n>"
 
 "let g:SuperTabDefaultCompletionType = 'context'
 "autocmd FileType *
@@ -852,8 +944,9 @@ set clipboard=unnamed	       " Yank to the system clipboard by default
 au InsertLeave * set nopaste
 
 " No annoying sound on errors
+" https://superuser.com/questions/622898/how-to-turn-off-the-bell-sound-in-intellij
+set visualbell
 set noerrorbells
-set novisualbell
 set t_vb=
 set tm=500
 
@@ -964,7 +1057,7 @@ tnoremap <leader>f <C-C><C-D>
 
 " Override ctrl-} behaviour to open a new window with the tag
 nnoremap } <C-w><C-]><C-w>T
-nnoremap ] *<C-]>0hn
+"nnoremap ] *<C-]>0hn
 
 nnoremap { g<C-]>
 
@@ -1369,17 +1462,6 @@ endfunction
 "nnoremap <leader>z :%g/0000000/d<cr>:%s/.*: 0000//<cr>
 "nnoremap <leader>a :%s/.*: 0000//<cr>:nunmap J<cr>:%g/./normal J<Cr>:%g!/ 0001/d<Cr>:%s/ 0001//<cr>
 
-nnoremap <leader>a :call FormatFile()<Cr>
-"colorscheme desert
-"
-
-"autocmd FileType vhdl :call ConfigForVHDL()<Cr>
-"
-function! FormatFile()
-
-    echom "test"
-endfunction
-
 " TODO: (`HUT`) : change J and K to actually move by block
 " Behaviour wanted: move to last non-whitespace or empty line, unless on 
 " Bonus: consider being comment-aware?
@@ -1394,7 +1476,7 @@ endfunction
 "
 
 "noremap J :call TestMe()<Cr>
-nnoremap K :echom "CAPS LOCK?"<cr>{kzz
+"nnoremap K :echom "CAPS LOCK?"<cr>{kzz " just did this -delete
 
 " TODO: (`HUT`) : rename this
 "vnoremap J :<C-u>call MoveMeBlock('visual', 'forward')<CR>
@@ -1461,7 +1543,7 @@ function! MoveMeBlock(mode, direction)
     call MoveToLine(b:prepend_command)
     "call feedkeys("gv18gg")
     "execute "normal! 19gg"
-endfunction;
+endfunction
 
 " Note: I think we want to find the end of the next block if we are at the end of a block
 
@@ -1516,16 +1598,19 @@ endfunction
 
 function! MoveToLine(prepend_command)
     call feedkeys(a:prepend_command."20gg")
-endfunction;
+endfunction
 
 " This callback will be executed when the entire command is completed
 function! BackgroundCommandClose(channel)
   " Read the output from the command into the quickfix window
   execute "cfile! " . g:backgroundCommandOutput
-  " Open the quickfix window
-  copen
-  " Jump back to the main window
-  wincmd p
+  " Only if there is anything in the output
+  if len(getqflist()) > 0
+    " Open the quickfix window
+    copen
+    " Jump back to the main window
+    wincmd p
+  endif
   unlet g:backgroundCommandOutput
 endfunction
 
@@ -1559,6 +1644,23 @@ command! -nargs=+ -complete=shellcmd RunBackgroundCommand call RunBackgroundComm
 "nnoremap <leader>f :w<Cr>:call CloseCopen()<Cr>:RunBackgroundCommand ./vim_helper.sh 
 nnoremap <leader>f :w<Cr>:call CloseCopen()<Cr>:RunBackgroundCommand ./run_build.sh<Cr>
 
+nnoremap <leader>a :call FormatFile()<Cr>
+"colorscheme desert
+"
+
+"autocmd FileType vhdl :call ConfigForVHDL()<Cr>
+"
+function! FormatFile()
+    if &filetype ==# 'rust'
+      execute ':w'
+      execute "silent :!cargo fmt"
+      execute ':redraw!'
+      execute ':e'
+    else
+      echom "No file formatter defined for lang: "
+    endif
+endfunction
+
 function! CloseCopen()
     let save_tab = tabpagenr()
     let save_win = winnr()
@@ -1566,3 +1668,6 @@ function! CloseCopen()
     exe "tabnext" save_tab
     exe save_win "wincmd w" 
 endfunction
+
+nnoremap <leader>b :!git co fork/master -- <c-r>=expand("%:p")<cr><cr><cr>
+cnoremap <leader>b !git co fork/master -- <c-r>=expand("%:p")<cr><cr><cr>

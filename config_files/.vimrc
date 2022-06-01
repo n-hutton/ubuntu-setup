@@ -294,7 +294,7 @@ if(g:wantCOC)
       autocmd FileType typescript,json setl formatexpr=CocAction('formatSelected')
       " Update signature help on jump placeholder
       autocmd User CocJumpPlaceholder call CocActionAsync('showSignatureHelp')
-    augroup end
+    augroup END
 
     " Remap for do codeAction of selected region, ex: `<leader>aap` for current paragraph
     vmap <leader>a  <Plug>(coc-codeaction-selected)
@@ -513,11 +513,11 @@ function! DoSearch(command)
         augroup flicker_command
             au!
             au CursorHold * call DoSearch('iterate')
-        augroup end
+        augroup END
     elseif a:command == 'iterate'
         setl updatetime=4000
         au! flicker_command
-        augroup! flicker_command
+        augroup! flicker_command augroup END
         let c = nr2char(getchar())
         while c =~ '\v^(n|N)$'
             " Note we don't put these jumps into our jumplist, that way we can ctrl-o back to before the search quicker
@@ -802,12 +802,14 @@ let s:prevtabindex=tabpagenr()
 
 augroup TabLeaving
         autocmd! TabLeave * :let s:prevtabindex=tabpagenr()
+augroup END
 
 augroup TabClosed
         autocmd! TabEnter * :if tabpagenr('$')<s:prevtabnum && tabpagenr()>1 && s:prevtabindex==tabpagenr()
                     \ | tabprevious
                     \ | endif
                     \ | let s:prevtabnum=tabpagenr('$')
+augroup END
 
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " =============Status line and line numbering=============

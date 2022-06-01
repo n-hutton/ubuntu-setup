@@ -67,6 +67,11 @@
 
 #############################################################
 #Change color template
+
+echo "Installing pathogen"
+mkdir -p ~/.vim/autoload ~/.vim/bundle && \
+curl -LSso ~/.vim/autoload/pathogen.vim https://tpo.pe/pathogen.vim
+
 echo "Do you want to change the color palette? (y/n)"
 read CHANGE_COLOR
 
@@ -74,12 +79,12 @@ if [ $CHANGE_COLOR == "y" ]
 then
     echo "Changing color palette..."
     echo "First lets change the palette for the terminal"
-    git clone git://github.com/Anthony25/gnome-terminal-colors-solarized.git
+    git clone git@github.com:aruhier/gnome-terminal-colors-solarized.git
     sudo apt-get install dconf-cli
     cd gnome-terminal-colors-solarized
     ./install.sh
     echo "Color palette now changed."
     echo "Download solarized colorscheme and put it in the bundle dir"
-    git clone git://github.com/altercation/vim-colors-solarized.git
+    git clone git@github.com:altercation/vim-colors-solarized.git
     mv vim-colors-solarized/ ~/.vim/bundle/
 fi

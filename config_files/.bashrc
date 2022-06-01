@@ -124,7 +124,7 @@ alias ls="ls --color=auto"
 
 alias netcat='nc'
 #alias v='vim.gnome -p'
-alias v='vim -p'
+alias v='/usr/local/bin/vim -p'
 alias ,q='exit'
 alias py='python3'
 
@@ -213,7 +213,7 @@ export mybash
 # Finding functions
 
 # Set a proj variable for project base
-proj=~/repos/fetch-ledger
+proj=~/repos/
 export proj
 alias pro='cd $proj'
 
@@ -397,6 +397,11 @@ export PATH
 PATH=$PATH:~/repos/scripts
 export PATH
 
+PATH=$PATH:/home/nathan/Downloads/clion-2022.1.1/bin
+export PATH
+
+export PATH="/usr/lib/ccache:$PATH"
+
 
 #cl(){
 #    echo -e "\e[31m Copying selection to clipboard \e[0m"
@@ -436,10 +441,15 @@ function locn() {
 #find ./ -type f -name "*.hpp" "*.cpp" -exec sed -i 's/substitution/replacement/g' {} \;
 
 
-export CXX=/usr/bin/clang++-6.0 
-export CC=/usr/bin/clang-6.0
+#export CXX=/usr/bin/clang++-6.0 
+#export CC=/usr/bin/clang-6.0
+
+export CC=/usr/bin/gcc-7
+export CXX=/usr/bin/g++-7
+
 export PYENV_ROOT="$HOME/.pyenv"
 export PATH="$PYENV_ROOT/bin:$PATH"
 if command -v pyenv 1>/dev/null 2>&1; then
   eval "$(pyenv init -)"
 fi
+. "$HOME/.cargo/env"

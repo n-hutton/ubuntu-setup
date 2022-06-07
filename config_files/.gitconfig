@@ -1,14 +1,16 @@
 [user]
-	name = nhutton
-	email = nathan.cameron.hutton@gmail.com
+	name = n-hutton
+	email = nathan.hutton@fetch.ai
 
 [alias]
 	lg = log --color --graph --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)<%an>%Creset' --abbrev-commit
 	st = status -s
+	tst = status -s
     diffgui = difftool --tool=p4merge --no-prompt
     mod = ls-files -m
+    bra = for-each-ref --sort=committerdate refs/heads/ --format='%(HEAD) %(color:yellow)%(if)%(upstream:short)%(then) %(align:width=50)%(upstream:short)%(end) %(else) %(color:green)%(align:width=50)%(refname:short)%(end) %(end)%(color:reset) - %(align:width=17)%(authorname)%(end) - %(contents:subject) (%(color:green)%(committerdate:relative)%(color:reset))'
 
-	sta = diff --name-only
+	sta = diff --name-only --diff-filter=U
 	co = checkout
   pushup = "!gitbranchname() { git symbolic-ref --short HEAD; }; gitpushupstream() { git push --set-upstream origin `gitbranchname`; }; gitpushupstream"
   upstream = "!git fetch main && git checkout develop && git merge main/develop"
@@ -16,7 +18,9 @@
 [diff]
     tool = kompare
 [core]
-	excludesfile = /home/nathan/.gitignore
+	excludesfile = /Users/nhutton/.gitignore
+	hooksPath = /Users/nhutton/.git/hooks
+	pager = less
 [push]
 	default = simple
 
@@ -26,4 +30,7 @@
     logg = "!f(){ git log --graph --stat --decorate=full --color --word-diff=color -M -C --find-copies-harder -l100 --histogram \"$@\"; }; f"
     oldest-ancestor = !zsh -c 'diff --old-line-format= --new-line-format= <(git rev-list --first-parent \"${1:-master}\") <(git rev-list --first-parent \"${2:-HEAD}\") | head -1' -
 [url "git@github.com:"]
-	insteadOf = github:
+	insteadOf = https://github.com/
+
+[credential]
+	username = n-hutton

@@ -1,6 +1,6 @@
 [user]
 	name = n-hutton
-	email = nathan.hutton@fetch.ai
+	email = nathan@zilliqa.com
 
 [alias]
 	lg = log --color --graph --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)<%an>%Creset' --abbrev-commit

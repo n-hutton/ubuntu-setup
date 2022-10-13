@@ -124,7 +124,7 @@ alias ls="ls --color=auto"
 
 alias netcat='nc'
 #alias v='vim.gnome -p'
-alias v='/usr/bin/vim -p'
+alias v='/usr/local/bin/vim -p'
 alias ,q='exit'
 alias py='python3'
 

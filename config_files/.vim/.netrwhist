@@ -1,0 +1,12 @@
+let g:netrw_dirhistmax  =10
+let g:netrw_dirhistcnt =0
+let g:netrw_dirhist_0='/etc/alternatives'
+let g:netrw_dirhist_9='/home/nathan/repos/Zilliqa/docker'
+let g:netrw_dirhist_8='/home/nathan/repos/Zilliqa'
+let g:netrw_dirhist_7='/home/nathan/repos/Zilliqa/tests/PythonEthApi'
+let g:netrw_dirhist_6='/home/nathan/repos/Zilliqa/cmake-build-debug/CMakeFiles'
+let g:netrw_dirhist_5='/home/nathan/repos/Zilliqa/.github'
+let g:netrw_dirhist_4='/home/nathan/repos/Zilliqa'
+let g:netrw_dirhist_3='/home/nathan/repos/Zilliqa/src/libCrypto'
+let g:netrw_dirhist_2='/home/nathan/repos/Zilliqa/src/libValidator'
+let g:netrw_dirhist_1='/home/nathan/repos/Zilliqa/src'

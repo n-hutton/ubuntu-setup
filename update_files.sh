@@ -3,7 +3,9 @@
 cp ~/.gitconfig ./config_files
 cp ~/.vimrc ./config_files
 cp ~/.bashrc ./config_files
-#cp ~/.vim/spell ./vim_files -r
-#mkdir -p ./vim_files/bundle
-#cp ~/.vim/bundle/vim-snippets ./vim_files/bundle -r
-#rm ./vim_files/bundle/vim-snippets/.git -rf
+cp ~/.zshrc ./config_files
+cp ~/gnome-terminal-profiles.dconf ./config_files
+cp -rf ~/repos/scripts ./
+cp -rf ~/.vim ./config_files
+rm -rf ./config_files/.vim/undo/*
+cp -rf ~/.git/hooks/ ./config_files

@@ -517,7 +517,7 @@ function! DoSearch(command)
     elseif a:command == 'iterate'
         setl updatetime=4000
         au! flicker_command
-        augroup! flicker_command augroup END
+        "augroup! flicker_command augroup END
         let c = nr2char(getchar())
         while c =~ '\v^(n|N)$'
             " Note we don't put these jumps into our jumplist, that way we can ctrl-o back to before the search quicker
@@ -940,7 +940,8 @@ set encoding=utf8              " Set utf8 as standard encoding and en_US as the 
 set ffs=unix,dos,mac           " Use Unix as the standard file type
 set lbr                        " Linebreak on 500 characters
 set tw=500
-set clipboard=unnamed	       " Yank to the system clipboard by default
+set clipboard=unnamedplus      " Yank to the system clipboard by default
+"set clipboard+=ideaput " do 'put' via IDE in jetbrains tools
 
 "disable paste mode when leaving normal mode
 au InsertLeave * set nopaste
@@ -979,8 +980,10 @@ noremap H ^
 onoremap H ^
 
 " TODO: (`HUT`) : improve this a lot
-nnoremap J :echo "CAPS LOCK?"<cr>}jzz
-nnoremap K :echo "CAPS LOCK?"<cr>{kzz
+"nnoremap J :echo "CAPS LOCK?"<cr>}jzz
+"nnoremap K :echo "CAPS LOCK?"<cr>{kzz
+nnoremap J }jzz
+nnoremap K {kzz
 vnoremap J /^$<Cr>
 vnoremap K ?^$<Cr>
 

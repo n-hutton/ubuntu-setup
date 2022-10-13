@@ -19,7 +19,7 @@
     tool = kompare
 [core]
 	excludesfile = /Users/nhutton/.gitignore
-	hooksPath = /Users/nhutton/.git/hooks
+	hooksPath = /home/nathan/.git/hooks
 	pager = less
 [push]
 	default = simple

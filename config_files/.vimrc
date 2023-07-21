@@ -1396,15 +1396,8 @@ iabbrev SLL std_logic
 " Quickly toggle comments in block
 vnoremap <leader>c :s/\v^\-\-/££/<Cr>:'<,'>g!/^££/normal I--<Cr>:'<,'>s/^££/  /<Cr>
 
-" Increment things vhdl-style TODO: (`HUT`) : put this in auto on vhdl open
-vnoremap + yA <= std_logic_vector(unsigned() + 1);<Esc>hhhhhhhp
-nnoremap + yiWA <= std_logic_vector(unsigned() + 1);<Esc>hhhhhhhp
-
-vnoremap - yA <= std_logic_vector(unsigned() - 1);<Esc>hhhhhhhp
-nnoremap - yiWA <= std_logic_vector(unsigned() - 1);<Esc>hhhhhhhp
-
-vnoremap _ yA <= (others => '0');<Esc>
-nnoremap _ yiWA <= (others => '0');<Esc>
+vnoremap - 0
+nnoremap - 0
 
 " quick reg copy
 nnoremap <leader>1 yypwea_r<Esc>ldldl

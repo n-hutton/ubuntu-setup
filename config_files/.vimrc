@@ -347,62 +347,6 @@ if(g:wantCOC)
 endif
 
 """""""""""""""""""""""""""""""""""""""""
-" LanguageClient-neovim
-"
-
-" Required for operations modifying multiple buffers like rename.
-set hidden
-
-let g:LanguageClient_serverCommands = {
-    \ 'rust': ['~/.cargo/bin/rustup', 'run', 'stable', 'rls'],
-    \ 'javascript': ['/usr/local/bin/javascript-typescript-stdio'],
-    \ 'javascript.jsx': ['tcp://127.0.0.1:2089'],
-    \ 'python': ['/usr/local/bin/pyls'],
-    \ 'ruby': ['~/.rbenv/shims/solargraph', 'stdio'],
-    \ 'go': ['go-langserver'],
-    \ }
-
-nnoremap <F6> :call LanguageClient_contextMenu()<CR>
-" Or map each action separately
-nnoremap <silent> Z :call LanguageClient#textDocument_hover()<CR>
-nnoremap <silent> gd :call LanguageClient#textDocument_definition()<CR>
-nnoremap <silent> <F2> :call LanguageClient#textDocument_rename()<CR>
-
-" Do not use tags to jump to definitions, instead use LanguageClient
-nnoremap ] :call LanguageClient#textDocument_definition()<CR>
-
-set runtimepath+=~/.vim/manually_installed/LanguageClient-neovim
-
-"https://www.reddit.com/r/vim/comments/b33lc1/a_guide_to_lsp_auto_completion_in_vim/
-let g:LanguageClient_autoStart = 1
-
-" We don't want our quickfix list always spammed with diagnostics
-let g:LanguageClient_diagnosticsList = 'Disabled'
-
-"let g:LanguageClient_serverCommands = {
-"  \ 'cpp': ['clangd'],
-"  \ }
-
-let g:mucomplete#completion_delay = 1
-"let g:mucomplete#completion_delay = 500
-"let g:mucomplete#reopen_immediately = 0
-
-"if executable('cquery')
-"     " Let the client know that for c and cpp files, use cquery.
-"     let g:LanguageClient_serverCommands = {
-"        \ 'c':   ['cquery', '--log-file=/tmp/vim-cquery.log',
-"        \         '--init={"cacheDirectory":"$HOME/.cquery-cache"}'],
-"        \ 'cpp': ['cquery', '--log-file=/tmp/vim-cquery.log',
-"        \         '--init={"cacheDirectory":"$HOME/.cquery-cache"}'],
-"        \ }
-"endif
-
-"nnoremap z :call LanguageClient_contextMenu()<CR>
-
-inoremap <silent><expr> <c-space> LanguageClient#textDocument_completion()
-"inoremap <silent><expr> <leader>q <C-R>=LanguageClient#textDocument_completion()<Cr>
-
-"""""""""""""""""""""""""""""""""""""""""
 " mu-complete
 " From https://www.reddit.com/r/vim/comments/b33lc1/a_guide_to_lsp_auto_completion_in_vim/
 " Mandatory options for plugin to work
@@ -470,6 +414,7 @@ set ignorecase                 " Ignore case when searching
 set smartcase                  " When searching try to be smart about cases
 set hlsearch                   " Highlight search results
 set incsearch                  " Start to go to words as they are typed
+set regexpengine=0             " Apparently I have to set this on mac or things are slow...
 
 "Keeps search results in middle of screen
 nnoremap <silent> n nzz

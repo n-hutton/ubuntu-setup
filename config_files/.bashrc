@@ -124,7 +124,7 @@ alias ls="ls --color=auto"
 
 alias netcat='nc'
 #alias v='vim.gnome -p'
-alias v='vim -p'
+alias v='/usr/local/bin/vim -p'
 alias ,q='exit'
 alias py='python3'
 
@@ -213,7 +213,7 @@ export mybash
 # Finding functions
 
 # Set a proj variable for project base
-proj=~/repos/fetch-ledger
+proj=~/repos/Zilliqa
 export proj
 alias pro='cd $proj'
 
@@ -397,6 +397,12 @@ export PATH
 PATH=$PATH:~/repos/scripts
 export PATH
 
+PATH=$PATH:/opt/clion-2022.2.4/bin/
+export PATH
+
+export PATH="/usr/lib/ccache:$PATH"
+export PATH="/usr/local/go/bin:$PATH"
+
 
 #cl(){
 #    echo -e "\e[31m Copying selection to clipboard \e[0m"
@@ -436,10 +442,36 @@ function locn() {
 #find ./ -type f -name "*.hpp" "*.cpp" -exec sed -i 's/substitution/replacement/g' {} \;
 
 
-export CXX=/usr/bin/clang++-6.0 
-export CC=/usr/bin/clang-6.0
-export PYENV_ROOT="$HOME/.pyenv"
-export PATH="$PYENV_ROOT/bin:$PATH"
-if command -v pyenv 1>/dev/null 2>&1; then
-  eval "$(pyenv init -)"
-fi
+#export CXX=/usr/bin/clang++-6.0 
+#export CC=/usr/bin/clang-6.0
+
+export CC=/usr/bin/gcc-11
+export CXX=/usr/bin/g++-11
+
+export VCPKG_ROOT=/home/nathan/repos/vcpkg
+
+
+#export PATH="~/.poetry/bin/:$PATH"
+#export PYENV_ROOT="$HOME/.pyenv"
+#export PATH="$PYENV_ROOT/bin:$PATH"
+#if command -v pyenv 1>/dev/null 2>&1; then
+#  eval "$(pyenv init -)"
+#fi
+
+. "$HOME/.cargo/env"
+
+# ripgrep stuff
+
+rr(){
+    rg -i "$*"
+}
+
+rl(){
+    rg -il "$*"
+}
+
+alias openall='eval $(history | grep -E "[0-9]+  rr " | tail -n 1 | sed -En "s/.*  rr (.*)/v $\(rl \1\)/p")'
+
+export NVM_DIR="$HOME/.nvm"
+[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
+[ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion

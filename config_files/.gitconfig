@@ -1,6 +1,6 @@
 [user]
 	name = n-hutton
-	email = nathan@zilliqa.com
+	email = nathan.cameron.hutton@gmail.com
 
 [alias]
 	lg = log --color --graph --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)<%an>%Creset' --abbrev-commit
@@ -19,8 +19,9 @@
     tool = kompare
 [core]
 	excludesfile = /Users/nhutton/.gitignore
-	hooksPath = /home/nathan/.git/hooks
+	hooksPath = /Users/nhutton/.git/hooks
 	pager = less
+	editor = vim
 [push]
 	default = simple
 

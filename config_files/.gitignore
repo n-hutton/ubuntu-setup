@@ -1,0 +1,10 @@
+tags
+compile_commands.json
+docker_ccache/
+vim_build_out.txt
+run_build.sh
+docker_ccache
+vendor/
+develop-image
+docker-images/
+out*.txt

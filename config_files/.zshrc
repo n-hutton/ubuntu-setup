@@ -8,15 +8,15 @@ export ZSH="/Users/nhutton/.oh-my-zsh"
 # load a random theme each time oh-my-zsh is loaded, in which case,
 # to know which specific one was loaded, run: echo $RANDOM_THEME
 # See https://github.com/robbyrussell/oh-my-zsh/wiki/Themes
-ZSH_THEME="powerlevel9k/powerlevel9k"
-POWERLEVEL9K_PROMPT_ON_NEWLINE=true
-POWERLEVEL9K_PROMPT_ADD_NEWLINE=true
-POWERLEVEL9K_DISABLE_RPROMPT=true
+ZSH_THEME="powerlevel10k/powerlevel10k"
+#POWERLEVEL9K_PROMPT_ON_NEWLINE=true
+#POWERLEVEL9K_PROMPT_ADD_NEWLINE=true
+#POWERLEVEL9K_DISABLE_RPROMPT=true
 
-POWERLEVEL9K_MULTILINE_FIRST_PROMPT_PREFIX=""
-POWERLEVEL9K_MULTILINE_LAST_PROMPT_PREFIX="$ "
+#POWERLEVEL9K_MULTILINE_FIRST_PROMPT_PREFIX=""
+#POWERLEVEL9K_MULTILINE_LAST_PROMPT_PREFIX="$ "
 
-POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(background_jobs dir load ram vcs ssh virtualenv pyenv command_execution_time)
+#POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(background_jobs dir load ram vcs ssh command_execution_time)
 
 # Which plugins would you like to load?
 # Standard plugins can be found in ~/.oh-my-zsh/plugins/*
@@ -49,16 +49,20 @@ HISTCONTROL=ignoreboth
 PROMPT_COMMAND="history -a;$PROMPT_COMMAND"
 
 # Set a proj variable for project base
-proj=~/repos/transmittal
+proj=~/repos/backend
 alt=~/repos/ledger-api-py
 
 export proj
 alias pro='cd `git rev-parse --show-toplevel || echo $proj`'
 alias alt='cd $alt'
+alias checkall='cargo +nightly fmt;cargo clippy --fix --lib -p zilliqa --allow-dirty;cargo +nightly fmt && cargo build --all-targets --all-features && __CARGO_FIX_YOLO=1 cargo clippy --allow-dirty --allow-staged --all-targets --all-features --fix && cargo clippy --all-targets --all-features -- -D warnings && echo "TESTING" &&  cargo test --release --all-targets --all-features'
 
 alias up='echo `git rev-parse --show-toplevel`; cd `git rev-parse --show-toplevel`'
 
 alias v='vim -p'
+alias gi='git'
+
+alias k='kubectl'
 
 function print_job_counts() {
 
@@ -119,8 +123,13 @@ PATH=$PATH:~/repos/scripts
 PATH=$PATH:/Users/nhutton/repos/flutter/bin
 PATH=$PATH:/Users/nhutton/Library/Android/sdk/cmdline-tools/latest/bin
 PATH=$PATH:/opt/homebrew/bin
+PATH=$PATH:/Users/nhutton/repos/vcpkg
+PATH=$PATH:/Users/nhutton/repos/scripts
 
 export PATH
+
+export VCPKG_ROOT="/Users/nhutton/repos/vcpkg"
+export CARGO_NET_GIT_FETCH_WITH_CLI=true
 
 # Don't question deletion with rm *
 setopt rmstarsilent
@@ -136,7 +145,7 @@ export GOPATH=~/go
 export GO111MODULE=on
 
 # Turn on pyenv automatically
-eval "$(pyenv init -)"
+#eval "$(pyenv init -)"
 
 export NVM_DIR="$HOME/.nvm"
 [ -s "/usr/local/opt/nvm/nvm.sh" ] && . "/usr/local/opt/nvm/nvm.sh"  # This loads nvm
@@ -154,3 +163,6 @@ function kgetall {
     fi
   done
 }
+
+# Created by `pipx` on 2025-03-10 18:40:09
+export PATH="$PATH:/Users/nhutton/.local/bin"
